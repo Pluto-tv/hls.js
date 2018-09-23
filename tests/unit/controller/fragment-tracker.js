@@ -16,9 +16,9 @@ function createMockBuffer (buffered) {
 }
 
 function createMockFragment (data, types) {
-  data._elementaryStreams = new Set(types);
+  data._elementaryStreams = types;
   data.hasElementaryStream = (type) => {
-    return data._elementaryStreams.has(type) === true;
+    return (data._elementaryStreams.indexOf(type) >= 0) === true;
   };
   return data;
 }
