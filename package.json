@@ -13,6 +13,7 @@
     "url": "https://github.com/video-dev/hls.js/issues"
   },
   "main": "./dist/hls.js",
+  "types": "./src/index.d.ts",
   "nyc": {
     "reporter": [
       "lcov"
@@ -31,10 +32,10 @@
     "build:analyze": "ANALYZE=true webpack --progress",
     "dev": "webpack-dev-server --progress --env.debug --port 8000",
     "docs": "esdoc",
-    "lint": "./scripts/lint.sh",
-    "lint:fix": "./scripts/lint.sh --fix",
-    "lint:quiet": "./scripts/lint.sh --quiet",
-    "precommit": "./scripts/precommit.sh",
+    "lint": "bash ./scripts/lint.sh",
+    "lint:fix": "bash ./scripts/lint.sh --fix",
+    "lint:quiet": "bash ./scripts/lint.sh --quiet",
+    
     "pretest": "npm run lint",
     "start": "npm run dev",
     "test": "npm run test:unit && npm run test:func",
