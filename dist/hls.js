@@ -446,10 +446,10 @@ if (true) {
 
 /***/ }),
 
-/***/ "./node_modules/node-libs-browser/node_modules/events/events.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/node-libs-browser/node_modules/events/events.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/events/events.js":
+/*!***************************************!*\
+  !*** ./node_modules/events/events.js ***!
+  \***************************************/
 /*! no static exports found */
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports) {
@@ -774,8 +774,8 @@ function isUndefined(arg) {
 (function(root) { 
 /* jshint ignore:end */
 
-  var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/\;?#]*)?(.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
-  var FIRST_SEGMENT_REGEX = /^([^\/;?#]*)(.*)$/;
+  var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/?#]*)?((?:[^\/\?#]*\/)*.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
+  var FIRST_SEGMENT_REGEX = /^([^\/?#]*)(.*)$/;
   var SLASH_DOT_REGEX = /(?:\/|^)\.(?=\/)/g;
   var SLASH_DOT_DOT_REGEX = /(?:\/|^)\.\.\/(?!\.\.\/).*?(?=\/)/g;
 
@@ -798,14 +798,14 @@ function isUndefined(arg) {
         if (!opts.alwaysNormalize) {
           return baseURL;
         }
-        var basePartsForNormalise = this.parseURL(baseURL);
-        if (!baseParts) {
+        var basePartsForNormalise = URLToolkit.parseURL(baseURL);
+        if (!basePartsForNormalise) {
           throw new Error('Error trying to parse base URL.');
         }
         basePartsForNormalise.path = URLToolkit.normalizePath(basePartsForNormalise.path);
         return URLToolkit.buildURLFromParts(basePartsForNormalise);
       }
-      var relativeParts = this.parseURL(relativeURL);
+      var relativeParts = URLToolkit.parseURL(relativeURL);
       if (!relativeParts) {
         throw new Error('Error trying to parse relative URL.');
       }
@@ -818,7 +818,7 @@ function isUndefined(arg) {
         relativeParts.path = URLToolkit.normalizePath(relativeParts.path);
         return URLToolkit.buildURLFromParts(relativeParts);
       }
-      var baseParts = this.parseURL(baseURL);
+      var baseParts = URLToolkit.parseURL(baseURL);
       if (!baseParts) {
         throw new Error('Error trying to parse base URL.');
       }
@@ -8560,7 +8560,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var demuxer_inline_1 = __webpack_require__(/*! ../demux/demuxer-inline */ "./src/demux/demuxer-inline.js");
 var events_1 = __webpack_require__(/*! ../events */ "./src/events.js");
 var logger_1 = __webpack_require__(/*! ../utils/logger */ "./src/utils/logger.js");
-var events_2 = __webpack_require__(/*! events */ "./node_modules/node-libs-browser/node_modules/events/events.js");
+var events_2 = __webpack_require__(/*! events */ "./node_modules/events/events.js");
 var DemuxerWorker = function (self) {
     // observer setup
     var observer = new events_2.EventEmitter();
