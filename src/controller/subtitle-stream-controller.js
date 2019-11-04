@@ -90,11 +90,6 @@ export class SubtitleStreamController extends BaseStreamController {
 
   // If something goes wrong, proceed to next frag, if we were processing one.
   onError (data) {
-    let frag = data.frag;
-    // don't handle error not related to subtitle fragment
-    if (!frag || frag.type !== 'subtitle') {
-      return;
-    }
     this.state = State.IDLE;
   }
 
@@ -219,6 +214,7 @@ export class SubtitleStreamController extends BaseStreamController {
         this.hls.trigger(Event.KEY_LOADING, { frag: foundFrag });
       } else if (foundFrag && fragmentTracker.getState(foundFrag) === FragmentState.NOT_LOADED) {
         // only load if fragment is not loaded
+        foundFrag.trackId = currentTrackId;
         this.fragCurrent = foundFrag;
         this.state = State.FRAG_LOADING;
         this.hls.trigger(Event.FRAG_LOADING, { frag: foundFrag });
