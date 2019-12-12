@@ -635,7 +635,8 @@ class BufferController extends EventHandler {
         */
         if (Math.min(removeEnd, bufEnd) - removeStart > 0.5) {
           logger.log(`sb remove ${type} [${removeStart},${removeEnd}], of [${bufStart},${bufEnd}], pos:${this.media.currentTime}`);
-          sb.remove(removeStart, removeEnd);
+          // tivo fix
+          // sb.remove(removeStart, removeEnd);
           return true;
         }
       }
