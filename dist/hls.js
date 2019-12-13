@@ -3488,7 +3488,8 @@ var BufferController = /** @class */ (function (_super) {
                 */
                 if (Math.min(removeEnd, bufEnd) - removeStart > 0.5) {
                     logger_1.logger.log("sb remove " + type + " [" + removeStart + "," + removeEnd + "], of [" + bufStart + "," + bufEnd + "], pos:" + this.media.currentTime);
-                    sb.remove(removeStart, removeEnd);
+                    // tivo fix
+                    // sb.remove(removeStart, removeEnd);
                     return true;
                 }
             }
@@ -11649,7 +11650,7 @@ var Hls = /** @class */ (function (_super) {
          * @type {string}
          */
         get: function () {
-            return "0.12.5-feature-v0-12-4-1-SNAPSHOT-e38a4fb";
+            return "0.11.1-feature-tivo-fix-SNAPSHOT-6cfc912";
         },
         enumerable: true,
         configurable: true
