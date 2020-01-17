@@ -7462,7 +7462,12 @@ function () {
             break;
 
           case 'ENDLIST':
-            level.live = false;
+            //Sometimes on a live stream we will get a bad ENDLIST
+            //This will ignore it and allow the stream to continue
+            var liveSyncPosition = this.hls.streamController.liveSyncPosition;
+            if (!liveSyncPosition){
+              level.live = false;
+            }
             break;
 
           case 'DIS':
