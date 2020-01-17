@@ -7353,8 +7353,8 @@ function () {
 
     return medias;
   };
-
-  M3U8Parser.parseLevelPlaylist = function parseLevelPlaylist(string, baseurl, id, type, levelUrlId) {
+  //Pluto - add the liveStreamSyncPosition to props
+  M3U8Parser.parseLevelPlaylist = function parseLevelPlaylist(string, baseurl, id, type, levelUrlId, liveStream) {
     var currentSN = 0;
     var totalduration = 0;
     var level = new level_Level(baseurl);
@@ -7462,10 +7462,9 @@ function () {
             break;
 
           case 'ENDLIST':
-            //Sometimes on a live stream we will get a bad ENDLIST
+            //Pluto - Sometimes on a live stream we will get a bad ENDLIST
             //This will ignore it and allow the stream to continue
-            var liveSyncPosition = this.hls.streamController.liveSyncPosition;
-            if (!liveSyncPosition){
+            if (!liveStream){
               level.live = false;
             }
             break;
@@ -7982,12 +7981,14 @@ function (_EventHandler) {
     var id = context.id,
         level = context.level,
         type = context.type;
+        //Pluto - add this for dealing with incorrect ENDLIST tag
+        liveStream = hls.streamContoller.liveSyncPosition;
     var url = PlaylistLoader.getResponseUrl(response, context); // if the values are null, they will result in the else conditional
 
     var levelUrlId = Object(number_isFinite["isFiniteNumber"])(id) ? id : 0;
     var levelId = Object(number_isFinite["isFiniteNumber"])(level) ? level : levelUrlId;
     var levelType = PlaylistLoader.mapContextToLevelType(context);
-    var levelDetails = m3u8_parser_M3U8Parser.parseLevelPlaylist(response.data, url, levelId, levelType, levelUrlId); // set stats on level structure
+    var levelDetails = m3u8_parser_M3U8Parser.parseLevelPlaylist(response.data, url, levelId, levelType, levelUrlId, liveStream); // set stats on level structure
     // TODO(jstackhouse): why? mixing concerns, is it just treated as value bag?
 
     levelDetails.tload = stats.tload; // We have done our first request (Manifest-type) and receive
