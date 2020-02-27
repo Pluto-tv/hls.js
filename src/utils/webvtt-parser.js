@@ -164,7 +164,7 @@ const WebVTTParser = {
           try {
             // Calculate subtitle offset in milliseconds.
             // If sync PTS is less than zero, we have a 33-bit wraparound, which is fixed by adding 2^33 = 8589934592.
-            mpegTs = ptsNormalize(mpegTs - syncPTS, vttCCs.ccOffset * 90000);
+            mpegTs = mpegTs - syncPTS;
             // Convert cue time to seconds
             localTime = cueString2millis(cueTime) / 1000;
             // Convert MPEGTS to seconds from 90kHz.
