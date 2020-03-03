@@ -534,6 +534,7 @@ class BufferController extends EventHandler {
         } catch (err) {
           // in case any error occured while appending, put back segment in segments table
           logger.error(`error while trying to append buffer:${err.message}`);
+          this.doFlush(); //We flush the buffer to recover from playback freeze issues.          
           segments.unshift(segment);
           let event = { type: ErrorTypes.MEDIA_ERROR, parent: segment.parent };
           if (err.code !== 22) {
