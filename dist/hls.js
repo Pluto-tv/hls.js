@@ -3095,6 +3095,7 @@ var BufferController = /** @class */ (function (_super) {
         for (var streamType in sourceBuffer) {
             timeRanges[streamType] = sourceBuffer[streamType].buffered;
         }
+        //console.log(pending,timeRanges, 'are appending', this.segments);
         this.hls.trigger(events_1.default.BUFFER_APPENDED, { parent: parent, pending: pending, timeRanges: timeRanges });
         // don't append in flushing mode
         if (!this._needsFlush) {
@@ -3476,25 +3477,13 @@ var BufferController = /** @class */ (function (_super) {
      */
     BufferController.prototype.removeBufferRange = function (type, sb, startOffset, endOffset) {
         try {
-            for (var i = 0; i < sb.buffered.length; i++) {
-                var bufStart = sb.buffered.start(i);
-                var bufEnd = sb.buffered.end(i);
-                var removeStart = Math.max(bufStart, startOffset);
-                var removeEnd = Math.min(bufEnd, endOffset);
-                /* sometimes sourcebuffer.remove() does not flush
-                  the exact expected time range.
-                  to avoid rounding issues/infinite loop,
-                  only flush buffer range of length greater than 500ms.
-                */
-                if (Math.min(removeEnd, bufEnd) - removeStart > 0.5) {
-                    logger_1.logger.log("sb remove " + type + " [" + removeStart + "," + removeEnd + "], of [" + bufStart + "," + bufEnd + "], pos:" + this.media.currentTime);
-                    sb.remove(removeStart, removeEnd);
-                    return true;
-                }
-            }
+            if (sb.updating)
+                return false;
+            sb.remove(startOffset, endOffset);
+            return true;
         }
         catch (error) {
-            logger_1.logger.warn('removeBufferRange failed', error);
+            console.log('removeBufferRange failed', error);
         }
         return false;
     };
@@ -11649,7 +11638,7 @@ var Hls = /** @class */ (function (_super) {
          * @type {string}
          */
         get: function () {
-            return "0.12.5-feature-v0-12-4-1-SNAPSHOT-e38a4fb";
+            return "0.12.4.2-feature-v0-12-4-2-SNAPSHOT-0505db9";
         },
         enumerable: true,
         configurable: true

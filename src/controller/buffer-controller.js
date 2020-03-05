@@ -223,7 +223,7 @@ class BufferController extends EventHandler {
     for (let streamType in sourceBuffer) {
       timeRanges[streamType] = sourceBuffer[streamType].buffered;
     }
-
+    //console.log(pending,timeRanges, 'are appending', this.segments);
     this.hls.trigger(Event.BUFFER_APPENDED, { parent, pending, timeRanges });
     // don't append in flushing mode
     if (!this._needsFlush) {
@@ -392,7 +392,6 @@ class BufferController extends EventHandler {
     const sourceBuffer = this.sourceBuffer;
     const bufferTypes = Object.keys(sourceBuffer);
     const targetBackBufferPosition = currentTime - Math.max(liveBackBufferLength, this._levelTargetDuration);
-
     for (let index = bufferTypes.length - 1; index >= 0; index--) {
       const bufferType = bufferTypes[index], buffered = sourceBuffer[bufferType].buffered;
 
@@ -533,8 +532,7 @@ class BufferController extends EventHandler {
           }
         } catch (err) {
           // in case any error occured while appending, put back segment in segments table
-          logger.error(`error while trying to append buffer:${err.message}`);
-          this.doFlush(); //We flush the buffer to recover from playback freeze issues.          
+          logger.error(`error while trying to append buffer:${err.message}`);          
           segments.unshift(segment);
           let event = { type: ErrorTypes.MEDIA_ERROR, parent: segment.parent };
           if (err.code !== 22) {
@@ -623,25 +621,11 @@ class BufferController extends EventHandler {
    */
   removeBufferRange (type, sb, startOffset, endOffset) {
     try {
-      for (let i = 0; i < sb.buffered.length; i++) {
-        let bufStart = sb.buffered.start(i);
-        let bufEnd = sb.buffered.end(i);
-        let removeStart = Math.max(bufStart, startOffset);
-        let removeEnd = Math.min(bufEnd, endOffset);
-
-        /* sometimes sourcebuffer.remove() does not flush
-          the exact expected time range.
-          to avoid rounding issues/infinite loop,
-          only flush buffer range of length greater than 500ms.
-        */
-        if (Math.min(removeEnd, bufEnd) - removeStart > 0.5) {
-          logger.log(`sb remove ${type} [${removeStart},${removeEnd}], of [${bufStart},${bufEnd}], pos:${this.media.currentTime}`);
-          sb.remove(removeStart, removeEnd);
-          return true;
-        }
-      }
+      if (sb.updating) return false;
+      sb.remove(startOffset, endOffset);
+      return true;
     } catch (error) {
-      logger.warn('removeBufferRange failed', error);
+      console.log('removeBufferRange failed', error);
     }
 
     return false;
