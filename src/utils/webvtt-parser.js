@@ -100,9 +100,10 @@ const WebVTTParser = {
       cue.startTime += cueOffset - localTime;
       cue.endTime += cueOffset - localTime;
 
+      const text = cue.text.trim();
       // Create a unique hash id for a cue based on start/end times and text.
       // This helps timeline-controller to avoid showing repeated captions.
-      cue.id = hash(cue.startTime.toString()) + hash(cue.endTime.toString()) + hash(cue.text);
+      cue.id = hash(cue.startTime.toString()) + hash(cue.endTime.toString()) + hash(text);
 
       // Fix encoding of special characters. TODO: Test with all sorts of weird characters.
       cue.text = decodeURIComponent(encodeURIComponent(cue.text));
