@@ -3393,11 +3393,6 @@ var BufferController = /** @class */ (function (_super) {
             return;
         }
 
-        if (!this.media) {
-          logger["logger"].error('flushLiveBackBuffer called without attaching media');
-          return;
-        }
-        
         var currentTime = this.media.currentTime;
         var sourceBuffer = this.sourceBuffer;
         var bufferTypes = Object.keys(sourceBuffer);

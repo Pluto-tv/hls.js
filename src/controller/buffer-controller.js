@@ -388,6 +388,11 @@ class BufferController extends EventHandler {
       return;
     }
 
+    if (!this.media) {
+      logger.error('flushLiveBackBuffer called without attaching media');
+      return;
+    }
+
     const currentTime = this.media.currentTime;
     const sourceBuffer = this.sourceBuffer;
     const bufferTypes = Object.keys(sourceBuffer);
