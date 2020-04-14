@@ -388,6 +388,11 @@ class BufferController extends EventHandler {
       return;
     }
 
+    if (!this.media) {
+      logger.error('flushLiveBackBuffer called without attaching media');
+      return;
+    }
+
     const currentTime = this.media.currentTime;
     const sourceBuffer = this.sourceBuffer;
     const bufferTypes = Object.keys(sourceBuffer);
@@ -622,8 +627,7 @@ class BufferController extends EventHandler {
   removeBufferRange (type, sb, startOffset, endOffset) {
     try {
       if (sb.updating) return false;
-      // tivo fix
-      // sb.remove(removeStart, removeEnd);
+      sb.remove(startOffset, endOffset);
       return true;
     } catch (error) {
       console.log('removeBufferRange failed', error);
