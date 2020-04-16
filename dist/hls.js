@@ -3393,10 +3393,9 @@ var BufferController = /** @class */ (function (_super) {
             return;
         }
         if (!this.media) {
-          logger_1.logger.error('flushLiveBackBuffer called without attaching media');
-          return;
+            logger_1.logger.error('flushLiveBackBuffer called without attaching media');
+            return;
         }
-
         var currentTime = this.media.currentTime;
         var sourceBuffer = this.sourceBuffer;
         var bufferTypes = Object.keys(sourceBuffer);
@@ -11789,7 +11788,7 @@ var Hls = /** @class */ (function (_super) {
          * @type {string}
          */
         get: function () {
-            return "0.12.4.2-1412b60";
+            return "0.12.4.4-noticket-nullMediaCheck-SNAPSHOT-a9e068c";
         },
         enumerable: true,
         configurable: true
