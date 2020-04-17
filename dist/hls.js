@@ -3393,8 +3393,8 @@ var BufferController = /** @class */ (function (_super) {
             return;
         }
         if (!this.media) {
-          logger_1.logger.error('flushLiveBackBuffer called without attaching media');
-          return;
+            logger_1.logger.error('flushLiveBackBuffer called without attaching media');
+            return;
         }
         var currentTime = this.media.currentTime;
         var sourceBuffer = this.sourceBuffer;
@@ -3629,8 +3629,7 @@ var BufferController = /** @class */ (function (_super) {
         try {
             if (sb.updating)
                 return false;
-            // tivo fix
-            // sb.remove(removeStart, removeEnd);
+            sb.remove(startOffset, endOffset);
             return true;
         }
         catch (error) {
@@ -11789,7 +11788,7 @@ var Hls = /** @class */ (function (_super) {
          * @type {string}
          */
         get: function () {
-            return "0.12.4.3-feature-v0-12-4-3-tivo-SNAPSHOT";
+            return "0.12.4.4-noticket-nullMediaCheckTivo-SNAPSHOT-5da0332";
         },
         enumerable: true,
         configurable: true
