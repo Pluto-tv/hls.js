@@ -627,7 +627,8 @@ class BufferController extends EventHandler {
   removeBufferRange (type, sb, startOffset, endOffset) {
     try {
       if (sb.updating) return false;
-      sb.remove(startOffset, endOffset);
+      //tivo fix
+      //sb.remove(startOffset, endOffset);
       return true;
     } catch (error) {
       console.log('removeBufferRange failed', error);

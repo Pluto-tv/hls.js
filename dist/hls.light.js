@@ -2462,7 +2462,8 @@ var BufferController = /** @class */ (function (_super) {
         try {
             if (sb.updating)
                 return false;
-            sb.remove(startOffset, endOffset);
+            //tivo fix
+            //sb.remove(startOffset, endOffset);
             return true;
         }
         catch (error) {
@@ -9341,7 +9342,7 @@ var Hls = /** @class */ (function (_super) {
          * @type {string}
          */
         get: function () {
-            return "0.12.4.4-noticket-nullMediaCheckTivo-SNAPSHOT-5da0332";
+            return "0.12.4.4-noticket-nullMediaCheckTivo-SNAPSHOT-604450b";
         },
         enumerable: true,
         configurable: true
