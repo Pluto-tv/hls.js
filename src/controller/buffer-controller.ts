@@ -491,6 +491,7 @@ class BufferController extends EventHandler {
           if (this.removeBufferRange(bufferType, sb, 0, targetBackBufferPosition)) {
             this.hls.trigger(Events.LIVE_BACK_BUFFER_REACHED, { bufferEnd: targetBackBufferPosition });
           }
+
         }
       }
     }

@@ -21,6 +21,7 @@ export function clearCurrentCues (track: TextTrack) {
 }
 
 /**
+
  *  Given a list of Cues, finds the closest cue matching the given time.
  *  Modified verison of binary search O(log(n)).
  *
