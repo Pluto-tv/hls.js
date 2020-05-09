@@ -242,7 +242,7 @@ export class SubtitleStreamController extends BaseStreamController {
           */
           
          foundFrag = fragments[0];
-         logger["logger"].warn(`Gap detected in live subtitle playlist, using next available fragment {start: ${foundFrag.start}}`);
+         logger.warn(`Gap detected in live subtitle playlist, using next available fragment {start: ${foundFrag.start}}`);
         }
 
       } else {
