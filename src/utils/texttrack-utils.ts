@@ -21,15 +21,16 @@ export function clearCurrentCues (track: TextTrack) {
 }
 
 /**
-  *  Given a list of Cues, finds the closest cue matching the given time.
-  *  Modified verison of binary search O(log(n)).
-  *
-  * @export
-  * @param {(TextTrackCueList | TextTrackCue[])} cues - List of cues.
-  * @param {number} time - Target time, to find closest cue to.
-  * @returns {TextTrackCue}
-  */
- export function getClosestCue (cues: TextTrackCueList | TextTrackCue[], time: number): TextTrackCue {
+
+ *  Given a list of Cues, finds the closest cue matching the given time.
+ *  Modified verison of binary search O(log(n)).
+ *
+ * @export
+ * @param {(TextTrackCueList | TextTrackCue[])} cues - List of cues.
+ * @param {number} time - Target time, to find closest cue to.
+ * @returns {TextTrackCue}
+ */
+export function getClosestCue (cues: TextTrackCueList | TextTrackCue[], time: number): TextTrackCue {
   // If the offset is less than the first element, the first element is the closest.
   if (time < cues[0].endTime) {
     return cues[0];

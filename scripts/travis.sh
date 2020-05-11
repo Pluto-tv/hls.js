@@ -11,6 +11,7 @@ if [ "${TRAVIS_MODE}" = "build" ]; then
   npm run lint
   echo "travis_fold:end:lint"
   echo "travis_fold:start:build"
+  npm run type-check
   npm run build
   echo "travis_fold:end:build"
   echo "travis_fold:start:docs"
@@ -47,7 +48,9 @@ elif [ "${TRAVIS_MODE}" = "release" ] || [ "${TRAVIS_MODE}" = "releaseCanary" ] 
   fi
   node ./scripts/set-package-version.js
   npm run lint
+  npm run type-check
   npm run build:ci
+
   if [ "${TRAVIS_MODE}" != "netlifyPr" ]; then
     npm run test:unit
     if [[ $(node ./scripts/check-already-published.js) = "not published" ]]; then

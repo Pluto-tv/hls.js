@@ -83,7 +83,15 @@ export class SubtitleStreamController extends BaseStreamController {
   }
 
   onMediaDetaching () {
+    if (!this.media) {
+      return;
+    }
     this.media.removeEventListener('seeking', this._onMediaSeeking);
+    this.fragmentTracker.removeAllFragments();
+    this.currentTrackId = -1;
+    this.tracks.forEach((track) => {
+      this.tracksBuffered[track.id] = [];
+    });
     this.media = null;
     this.state = State.STOPPED;
   }
@@ -112,7 +120,7 @@ export class SubtitleStreamController extends BaseStreamController {
   onSubtitleTrackSwitch (data) {
     this.currentTrackId = data.id;
 
-    if (!this.tracks || this.currentTrackId === -1) {
+    if (!this.tracks || !this.tracks.length || this.currentTrackId === -1) {
       this.clearInterval();
       return;
     }
@@ -210,6 +218,33 @@ export class SubtitleStreamController extends BaseStreamController {
         if (!foundFrag) {
           foundFrag = findFragmentByPTS(fragPrevious, fragments, bufferEnd, maxFragLookUpTolerance);
         }
+        if (!foundFrag && trackDetails.live && fragPrevious && fragPrevious.start < fragments[0].start) {
+          /*
+          below is a real world example of what can happen in production. 
+          
+          fragPrevious  s:04:08:44.000Z, e:04:08:49.000Z -- was found by PDT
+          
+          # response on subtitle/en/playlist.m3u8 on Nth call
+          fragments[0]: s:04:08:24.000Z, e:04:08:29.000Z -- s:4532.900002, e:4537.900002
+          fragments[1]: s:04:08:29.000Z, e:04:08:34.000Z -- s:4537.900002, e:4542.900002
+          fragments[2]: s:04:08:34.000Z, e:04:08:39.000Z -- s:4542.900002, e:4547.900002
+          fragments[3]: s:04:08:39.000Z, e:04:08:44.000Z -- s:4547.900002, e:4552.900002
+          fragments[4]: s:04:08:44.000Z, e:04:08:49.000Z -- s:4552.900002, e:4557.900002
+
+          # response on subtitle/en/playlist.m3u8 on (N+1)th call
+          fragments[0]: s:04:08:54.000Z, e:04:08:59.000Z -- s:4562.900002, e:4567.900002
+          fragments[1]: s:04:08:59.000Z, e:04:09:04.000Z -- s:4567.900002, e:4572.900002
+          fragments[2]: s:04:09:04.000Z, e:04:09:09.000Z -- s:4572.900002, e:4577.900002
+          fragments[3]: s:04:09:09.000Z, e:04:09:14.000Z -- s:4577.900002, e:4582.900002
+          fragments[4]: s:04:09:14.000Z, e:04:09:19.000Z -- s:4582.900002, e:4587.900002
+
+          # notice the gap from e:04:08:49.000Z to s:04:08:54.000Z, code below is to fix this issue
+          */
+          
+         foundFrag = fragments[0];
+         logger.warn(`Gap detected in live subtitle playlist, using next available fragment {start: ${foundFrag.start}}`);
+        }
+
       } else {
         foundFrag = fragments[fragLen - 1];
       }
