@@ -720,28 +720,33 @@ class BufferController extends EventHandler {
    */
   removeBufferRange (type: string, sb: ExtendedSourceBuffer, startOffset: number, endOffset: number): boolean {
     try {
-      for (let i = 0; i < sb.buffered.length; i++) {
-        let bufStart = sb.buffered.start(i);
-        let bufEnd = sb.buffered.end(i);
-        let removeStart = Math.max(bufStart, startOffset);
-        let removeEnd = Math.min(bufEnd, endOffset);
+      //Tivo - This prevents the black screen stalling
+      //Left in try/catch to preserve the pattern.
+      //Left old code just in case there is a different fix
+      return true;
 
-        /* sometimes sourcebuffer.remove() does not flush
-          the exact expected time range.
-          to avoid rounding issues/infinite loop,
-          only flush buffer range of length greater than 500ms.
-        */
-        if (Math.min(removeEnd, bufEnd) - removeStart > 0.5) {
-          let currentTime: string = 'null';
-          if (this.media) {
-            currentTime = this.media.currentTime.toString();
-          }
+      // for (let i = 0; i < sb.buffered.length; i++) {
+      //   let bufStart = sb.buffered.start(i);
+      //   let bufEnd = sb.buffered.end(i);
+      //   let removeStart = Math.max(bufStart, startOffset);
+      //   let removeEnd = Math.min(bufEnd, endOffset);
 
-          logger.log(`sb remove ${type} [${removeStart},${removeEnd}], of [${bufStart},${bufEnd}], pos:${currentTime}`);
-          sb.remove(removeStart, removeEnd);
-          return true;
-        }
-      }
+      //   /* sometimes sourcebuffer.remove() does not flush
+      //     the exact expected time range.
+      //     to avoid rounding issues/infinite loop,
+      //     only flush buffer range of length greater than 500ms.
+      //   */
+      //   if (Math.min(removeEnd, bufEnd) - removeStart > 0.5) {
+      //     let currentTime: string = 'null';
+      //     if (this.media) {
+      //       currentTime = this.media.currentTime.toString();
+      //     }
+
+      //     logger.log(`sb remove ${type} [${removeStart},${removeEnd}], of [${bufStart},${bufEnd}], pos:${currentTime}`);
+      //     sb.remove(removeStart, removeEnd);
+      //     return true;
+      //  }
+      //}
     } catch (error) {
       logger.warn('removeBufferRange failed', error);
     }
