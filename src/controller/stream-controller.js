@@ -99,9 +99,9 @@ class StreamController extends BaseStreamController {
       this._doTickIdle();
       break;
     case State.WAITING_LEVEL:
-      var level = this.levels[this.level];
-      // check if playlist is already loaded
-      if (level && level.details) {
+      var details = this.levels[this.level]?.details;
+       // check if playlist is already loaded (must be current level for live)
+      if (details && (!details.live || this.levelLastLoaded === this.level)) {
         this.state = State.IDLE;
       }
 
