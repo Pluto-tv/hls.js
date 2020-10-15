@@ -4,7 +4,6 @@
 
 class AAC {
   static getSilentFrame (codec, channelCount) {
-    return null; //Hisense has issue with silent frames so commenting it out for all platforms as test
     switch (codec) {
     case 'mp4a.40.2':
       if (channelCount === 1) {
