@@ -516,7 +516,7 @@ Player position is outside of the buffered range, so depends on the platform/eng
 2. Seek event is fired, but playback is stalled after calling `play` (e.g. Xboxone)
 
 Having `seekWithinTolerance` enabled will seek to `buffered.start` position which equals `300.03` for the example above.
-As a side effect this option fires `Hls.Events.Seeked` only when current playback position is inside buffered range.
+As a side effect this option fires `Hls.Events.CAN_PLAY_AFTER_SEEK` only when current playback position is inside buffered range.
 
 ### `maxMaxBufferLength`
 
