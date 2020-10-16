@@ -108,7 +108,9 @@ const HlsEvents = {
   // fired upon stream controller state transitions - data: { previousState, nextState }
   STREAM_STATE_TRANSITION: 'hlsStreamStateTransition',
   // fired when the live back buffer is reached defined by the liveBackBufferLength config option - data : { bufferEnd: number }
-  LIVE_BACK_BUFFER_REACHED: 'hlsLiveBackBufferReached'
+  LIVE_BACK_BUFFER_REACHED: 'hlsLiveBackBufferReached',
+  // fired when `seeked` event happens, not fired if current position is outside of the buffered range and config option `seekWithinTolerance` is true
+  CAN_PLAY_AFTER_SEEK: 'hlsCanPlayAfterSeek',
 };
 
 export default HlsEvents;

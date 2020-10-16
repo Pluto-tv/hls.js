@@ -146,4 +146,23 @@ export class BufferHelper {
     }
     return { len: bufferLen, start: bufferStart, end: bufferEnd, nextStart: bufferStartNext };
   }
+
+  static getBufferedPosWithinTolerance(media, pos, maxFragLookUpTolerance) {
+    const currentTime = media ? media.currentTime : undefined;
+
+    if (BufferHelper.isBuffered(media, currentTime)) {
+      return pos;
+    }
+
+    const buffered = media.buffered;
+    for (let i = 0; i < buffered.length; i++) {
+      const start = buffered.start(i);
+
+      if (start > currentTime && start < currentTime + maxFragLookUpTolerance) {
+        return start;
+      }
+    }
+
+    return pos;
+  }
 }

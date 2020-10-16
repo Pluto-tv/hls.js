@@ -706,6 +706,13 @@ class StreamController extends BaseStreamController {
   onMediaSeeked () {
     const media = this.media;
     const currentTime = media ? media.currentTime : undefined;
+    const { seekWithinTolerance } = this.config;
+
+    // We are not firing Event.CAN_PLAY_AFTER_SEEK only if we are seeking again to reach buffered fragment.
+    if (!seekWithinTolerance || !this.gapController.seekWithinToleranceIfNeeded()) {
+      this.hls.trigger(Event.CAN_PLAY_AFTER_SEEK);
+    }
+
     if (Number.isFinite(currentTime)) {
       logger.log(`media seeked to ${currentTime.toFixed(3)}`);
     }

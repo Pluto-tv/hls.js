@@ -56,6 +56,11 @@ export default class GapController {
       this.stalled = null;
     }
 
+    const { seekWithinTolerance } = this.config;
+    if (seekWithinTolerance && (seeking || seeked)) {
+      this.seekWithinToleranceIfNeeded();
+    }
+
     // The playhead should not be moving
     if (media.paused || media.ended || media.playbackRate === 0 || !media.buffered.length) {
       return;
@@ -108,6 +113,23 @@ export default class GapController {
 
     const bufferedWithHoles = BufferHelper.bufferInfo(media, currentTime, config.maxBufferHole);
     this._tryFixBufferStall(bufferedWithHoles, stalledDuration);
+  }
+
+  seekWithinToleranceIfNeeded() {
+    const media = this.media;
+    const currentTime = media ? media.currentTime : undefined;
+    const { maxFragLookUpTolerance } = this.config;
+
+    const bufferedPosWithinTolerance =
+      BufferHelper.getBufferedPosWithinTolerance(media, currentTime, maxFragLookUpTolerance);
+
+    if (currentTime !== bufferedPosWithinTolerance) {
+      logger.log(`seeking to position within maxFragLookUpTolerance - ${bufferedPosWithinTolerance}`);
+      media.currentTime = bufferedPosWithinTolerance;
+      return true;
+    }
+
+    return false;
   }
 
   /**
