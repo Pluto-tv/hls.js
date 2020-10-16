@@ -115,11 +115,16 @@ export default class GapController {
     this._tryFixBufferStall(bufferedWithHoles, stalledDuration);
   }
 
+  // If current position is outside of buffered range and there is a buffered fragment within `maxFragLookUpTolerance`
+  // will seek to this buffered fragment. It helps to prevent playback stalls
   seekWithinToleranceIfNeeded() {
     const media = this.media;
     const currentTime = media ? media.currentTime : undefined;
     const { maxFragLookUpTolerance } = this.config;
 
+    // Trying to find buffered position within `maxFragLookUpTolerance`. Returns same position if
+    // current time is already inside of buffered range or there is no buffered fragment
+    // within `maxFragLookUpTolerance`.
     const bufferedPosWithinTolerance =
       BufferHelper.getBufferedPosWithinTolerance(media, currentTime, maxFragLookUpTolerance);
 
