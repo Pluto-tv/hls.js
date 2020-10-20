@@ -6575,7 +6575,7 @@ var HlsEvents = (_HlsEvents = {
   KEY_LOADED: 'hlsKeyLoaded',
   // fired upon stream controller state transitions - data: { previousState, nextState }
   STREAM_STATE_TRANSITION: 'hlsStreamStateTransition'
-}, _HlsEvents["LIVE_BACK_BUFFER_REACHED"] = 'hlsLiveBackBufferReached', _HlsEvents);
+}, _HlsEvents["LIVE_BACK_BUFFER_REACHED"] = 'hlsLiveBackBufferReached', _HlsEvents.CAN_PLAY_AFTER_SEEK = 'hlsCanPlayAfterSeek', _HlsEvents);
 /* harmony default export */ __webpack_exports__["default"] = (HlsEvents);
 
 /***/ }),
@@ -9051,6 +9051,29 @@ function () {
       end: bufferEnd,
       nextStart: bufferStartNext
     };
+  } // Trying to find buffered position within `maxFragLookUpTolerance`. Returns same position if
+  // current time is already inside of buffered range or there is no buffered fragment
+  // within `maxFragLookUpTolerance`.
+  ;
+
+  BufferHelper.getBufferedPosWithinTolerance = function getBufferedPosWithinTolerance(media, pos, maxFragLookUpTolerance) {
+    var currentTime = media ? media.currentTime : undefined; // No need to seek if current playback position is already inside buffered range
+
+    if (BufferHelper.isBuffered(media, currentTime)) {
+      return pos;
+    }
+
+    var buffered = media.buffered;
+
+    for (var i = 0; i < buffered.length; i++) {
+      var start = buffered.start(i); // Returns the start position of buffered range if `currentTime` is within `maxFragLookUpTolerance` range
+
+      if (start > currentTime && start < currentTime + maxFragLookUpTolerance) {
+        return start;
+      }
+    }
+
+    return pos;
   };
 
   return BufferHelper;
@@ -9903,6 +9926,12 @@ function () {
 
     if (beginSeek || seeked) {
       this.stalled = null;
+    }
+
+    var seekWithinTolerance = this.config.seekWithinTolerance;
+
+    if (seekWithinTolerance && (seeking || seeked)) {
+      this.seekWithinToleranceIfNeeded();
     } // The playhead should not be moving
 
 
@@ -9963,6 +9992,26 @@ function () {
     var bufferedWithHoles = BufferHelper.bufferInfo(media, currentTime, config.maxBufferHole);
 
     this._tryFixBufferStall(bufferedWithHoles, stalledDuration);
+  } // If current position is outside of buffered range and there is a buffered fragment within `maxFragLookUpTolerance`
+  // will seek to this buffered fragment. It helps to prevent playback stalls
+  ;
+
+  _proto.seekWithinToleranceIfNeeded = function seekWithinToleranceIfNeeded() {
+    var media = this.media;
+    var currentTime = media ? media.currentTime : undefined;
+    var maxFragLookUpTolerance = this.config.maxFragLookUpTolerance; // Trying to find buffered position within `maxFragLookUpTolerance`. Returns same position if
+    // current time is already inside of buffered range or there is no buffered fragment
+    // within `maxFragLookUpTolerance`.
+
+    var bufferedPosWithinTolerance = BufferHelper.getBufferedPosWithinTolerance(media, currentTime, maxFragLookUpTolerance);
+
+    if (currentTime !== bufferedPosWithinTolerance) {
+      logger["logger"].log("seeking to position within maxFragLookUpTolerance - " + bufferedPosWithinTolerance);
+      media.currentTime = bufferedPosWithinTolerance;
+      return true;
+    }
+
+    return false;
   }
   /**
    * Detects and attempts to fix known buffer stalling issues.
@@ -11162,6 +11211,11 @@ function (_BaseStreamController) {
   _proto.onMediaSeeked = function onMediaSeeked() {
     var media = this.media;
     var currentTime = media ? media.currentTime : undefined;
+    var seekWithinTolerance = this.config.seekWithinTolerance; // We are not firing Event.CAN_PLAY_AFTER_SEEK only if we are seeking again to reach buffered fragment.
+
+    if (!seekWithinTolerance || !this.gapController.seekWithinToleranceIfNeeded()) {
+      this.hls.trigger(events["default"].CAN_PLAY_AFTER_SEEK);
+    }
 
     if (Object(number_isFinite["isFiniteNumber"])(currentTime)) {
       logger["logger"].log("media seeked to " + currentTime.toFixed(3));

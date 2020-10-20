@@ -34,6 +34,7 @@
   - [`nudgeOffset`](#nudgeoffset)
   - [`nudgeMaxRetry`](#nudgemaxretry)
   - [`maxFragLookUpTolerance`](#maxfraglookuptolerance)
+  - [`seekWithinTolerance`](#seekwithintolerance)
   - [`maxMaxBufferLength`](#maxmaxbufferlength)
   - [`liveSyncDurationCount`](#livesyncdurationcount)
   - [`liveMaxLatencyDurationCount`](#livemaxlatencydurationcount)
@@ -498,6 +499,24 @@ frag[1] : [9.8,19.8]
 ```
 
 This time, `buffered.end` is within `frag[1]` range, and `frag[1]` will be the next fragment to be loaded, as expected.
+
+### `seekWithinTolerance`
+
+(default: `false`)
+
+This options is used during seeking to reach the closest fragment within `maxFragLookUpTolerance` to cope with situations like:
+
+```
+media.currentTime = 300
+buffered.start = 300.03 // due to `maxFragLookUpTolerance`
+buffered.start = 380.03
+```
+Player position is outside of the buffered range, so depends on the platform/engine it might lead to the next options:
+1. Seek event is not fired (e.g. Chrome)
+2. Seek event is fired, but playback is stalled after calling `play` (e.g. Xboxone)
+
+Having `seekWithinTolerance` enabled will seek to `buffered.start` position which equals `300.03` for the example above.
+As a side effect this option fires `Hls.Events.CAN_PLAY_AFTER_SEEK` only when current playback position is inside buffered range.
 
 ### `maxMaxBufferLength`
 
@@ -1252,6 +1271,7 @@ Full list of Events is available below:
     -  data: { frag : fragment object }
   - `Hls.Events.STREAM_STATE_TRANSITION`  - fired upon stream controller state transitions
     -  data: { previousState, nextState }
+  - `Hls.Events.CAN_PLAY_AFTER_SEEK` - fired when `seeked` event happens, not fired if current position is outside of the buffered range and config option `seekWithinTolerance` is true.
 
 ## Loader Composition
 

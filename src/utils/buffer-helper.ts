@@ -146,4 +146,28 @@ export class BufferHelper {
     }
     return { len: bufferLen, start: bufferStart, end: bufferEnd, nextStart: bufferStartNext };
   }
+
+  // Trying to find buffered position within `maxFragLookUpTolerance`. Returns same position if
+  // current time is already inside of buffered range or there is no buffered fragment
+  // within `maxFragLookUpTolerance`.
+  static getBufferedPosWithinTolerance(media, pos, maxFragLookUpTolerance) {
+    const currentTime = media ? media.currentTime : undefined;
+
+    // No need to seek if current playback position is already inside buffered range
+    if (BufferHelper.isBuffered(media, currentTime)) {
+      return pos;
+    }
+
+    const buffered = media.buffered;
+    for (let i = 0; i < buffered.length; i++) {
+      const start = buffered.start(i);
+
+      // Returns the start position of buffered range if `currentTime` is within `maxFragLookUpTolerance` range
+      if (start > currentTime && start < currentTime + maxFragLookUpTolerance) {
+        return start;
+      }
+    }
+
+    return pos;
+  }
 }

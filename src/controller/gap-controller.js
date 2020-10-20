@@ -56,6 +56,11 @@ export default class GapController {
       this.stalled = null;
     }
 
+    const { seekWithinTolerance } = this.config;
+    if (seekWithinTolerance && (seeking || seeked)) {
+      this.seekWithinToleranceIfNeeded();
+    }
+
     // The playhead should not be moving
     if (media.paused || media.ended || media.playbackRate === 0 || !media.buffered.length) {
       return;
@@ -108,6 +113,28 @@ export default class GapController {
 
     const bufferedWithHoles = BufferHelper.bufferInfo(media, currentTime, config.maxBufferHole);
     this._tryFixBufferStall(bufferedWithHoles, stalledDuration);
+  }
+
+  // If current position is outside of buffered range and there is a buffered fragment within `maxFragLookUpTolerance`
+  // will seek to this buffered fragment. It helps to prevent playback stalls
+  seekWithinToleranceIfNeeded() {
+    const media = this.media;
+    const currentTime = media ? media.currentTime : undefined;
+    const { maxFragLookUpTolerance } = this.config;
+
+    // Trying to find buffered position within `maxFragLookUpTolerance`. Returns same position if
+    // current time is already inside of buffered range or there is no buffered fragment
+    // within `maxFragLookUpTolerance`.
+    const bufferedPosWithinTolerance =
+      BufferHelper.getBufferedPosWithinTolerance(media, currentTime, maxFragLookUpTolerance);
+
+    if (currentTime !== bufferedPosWithinTolerance) {
+      logger.log(`seeking to position within maxFragLookUpTolerance - ${bufferedPosWithinTolerance}`);
+      media.currentTime = bufferedPosWithinTolerance;
+      return true;
+    }
+
+    return false;
   }
 
   /**
