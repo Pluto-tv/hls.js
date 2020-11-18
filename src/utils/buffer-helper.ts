@@ -164,7 +164,7 @@ export class BufferHelper {
 
       // Returns the start position of buffered range if `currentTime` is within `maxFragLookUpTolerance` range
       if (start > currentTime && start < currentTime + maxFragLookUpTolerance) {
-        return start;
+        return Math.ceil(start * 10) / 10;
       }
     }
 
