@@ -113,7 +113,7 @@ class MP4Remuxer {
       tracks = {},
       data = { tracks: tracks },
       computePTSDTS = (this._initPTS === undefined),
-      initPTS, initDTS;
+      initPTS, initDTS, timescale;
 
     if (computePTSDTS) {
       initPTS = initDTS = Infinity;
@@ -143,8 +143,9 @@ class MP4Remuxer {
         }
       };
       if (computePTSDTS) {
+        timescale = audioTrack.inputTimeScale;
         // remember first PTS of this demuxing context. for audio, PTS = DTS
-        initPTS = initDTS = audioSamples[0].pts - audioTrack.inputTimeScale * timeOffset;
+        initPTS = initDTS = audioSamples[0].pts - Math.round(timescale * timeOffset);
       }
     }
 
@@ -163,9 +164,10 @@ class MP4Remuxer {
         }
       };
       if (computePTSDTS) {
+        timescale = videoTrack.inputTimeScale;
         initPTS = Math.min(initPTS, videoSamples[0].pts - inputTimeScale * timeOffset);
         initDTS = Math.min(initDTS, videoSamples[0].dts - inputTimeScale * timeOffset);
-        this.observer.trigger(Event.INIT_PTS_FOUND, { initPTS: initPTS });
+        this.observer.trigger(Event.INIT_PTS_FOUND, { initPTS: initPTS, timescale });
       }
     }
 
@@ -797,6 +799,29 @@ class MP4Remuxer {
 
     return value;
   }
+}
+
+export function normalizePts (value, reference) {
+  let offset;
+  if (reference === null) {
+    return value;
+  }
+
+  if (reference < value) {
+    // - 2^33
+    offset = -8589934592;
+  } else {
+    // + 2^33
+    offset = 8589934592;
+  }
+  /* PTS is 33bit (from 0 to 2^33 -1)
+    if diff between value and reference is bigger than half of the amplitude (2^32) then it means that
+    PTS looping occured. fill the gap */
+  while (Math.abs(value - reference) > 4294967296) {
+    value += offset;
+  }
+
+  return value;
 }
 
 export default MP4Remuxer;
