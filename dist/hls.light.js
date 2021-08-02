@@ -4409,7 +4409,8 @@ function () {
     },
         computePTSDTS = this._initPTS === undefined,
         initPTS,
-        initDTS;
+        initDTS,
+        timescale;
 
     if (computePTSDTS) {
       initPTS = initDTS = Infinity;
@@ -4444,8 +4445,9 @@ function () {
       };
 
       if (computePTSDTS) {
-        // remember first PTS of this demuxing context. for audio, PTS = DTS
-        initPTS = initDTS = audioSamples[0].pts - audioTrack.inputTimeScale * timeOffset;
+        timescale = audioTrack.inputTimeScale; // remember first PTS of this demuxing context. for audio, PTS = DTS
+
+        initPTS = initDTS = audioSamples[0].pts - Math.round(timescale * timeOffset);
       }
     }
 
@@ -4465,10 +4467,12 @@ function () {
       };
 
       if (computePTSDTS) {
+        timescale = videoTrack.inputTimeScale;
         initPTS = Math.min(initPTS, videoSamples[0].pts - inputTimeScale * timeOffset);
         initDTS = Math.min(initDTS, videoSamples[0].dts - inputTimeScale * timeOffset);
         this.observer.trigger(events["default"].INIT_PTS_FOUND, {
-          initPTS: initPTS
+          initPTS: initPTS,
+          timescale: timescale
         });
       }
     }
@@ -5150,6 +5154,31 @@ function () {
   return MP4Remuxer;
 }();
 
+function normalizePts(value, reference) {
+  var offset;
+
+  if (reference === null) {
+    return value;
+  }
+
+  if (reference < value) {
+    // - 2^33
+    offset = -8589934592;
+  } else {
+    // + 2^33
+    offset = 8589934592;
+  }
+  /* PTS is 33bit (from 0 to 2^33 -1)
+    if diff between value and reference is bigger than half of the amplitude (2^32) then it means that
+    PTS looping occured. fill the gap */
+
+
+  while (Math.abs(value - reference) > 4294967296) {
+    value += offset;
+  }
+
+  return value;
+}
 /* harmony default export */ var mp4_remuxer = (mp4_remuxer_MP4Remuxer);
 // CONCATENATED MODULE: ./src/remux/passthrough-remuxer.js
 /**

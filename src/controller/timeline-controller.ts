@@ -2,7 +2,7 @@ import Event from '../events';
 import EventHandler from '../event-handler';
 import Cea608Parser, { CaptionScreen } from '../utils/cea-608-parser';
 import OutputFilter from '../utils/output-filter';
-import WebVTTParser from '../utils/webvtt-parser';
+import { parseWebVTT } from '../utils/webvtt-parser';
 import { logger } from '../utils/logger';
 import { sendAddTrackEvent, clearCurrentCues } from '../utils/texttrack-utils';
 import Fragment from '../loader/fragment';
@@ -17,6 +17,7 @@ class TimelineController extends EventHandler {
   private textTracks: Array<TextTrack> = [];
   private tracks: Array<any> = [];
   private initPTS: Array<number> = [];
+  private timescale: Array<number> = [];
   private unparsedVttFrags: Array<{frag: Fragment, payload: any}> = [];
   private cueRanges: Array<any> = [];
   private captionsTracks: any = {};
@@ -82,11 +83,13 @@ class TimelineController extends EventHandler {
   }
 
   // Triggered when an initial PTS is found; used for synchronisation of WebVTT.
-  onInitPtsFound (data: { id: string, frag: Fragment, initPTS: number}) {
-    const { frag, id, initPTS } = data;
+  onInitPtsFound (data: { id: string, frag: Fragment, initPTS: number, timescale: number }) {
+    const { frag, id, initPTS, timescale } = data;
     const { unparsedVttFrags } = this;
+
     if (id === 'main') {
       this.initPTS[frag.cc] = initPTS;
+      this.timescale[frag.cc] = timescale;
     }
 
     // Due to asynchronous processing, initial PTS may arrive later than the first VTT fragments are loaded.
@@ -168,6 +171,7 @@ class TimelineController extends EventHandler {
         start: 0, prevCC: -1, new: false
       }
     };
+    this.timescale = [];
     this._cleanTracks();
   }
 
@@ -272,58 +276,66 @@ class TimelineController extends EventHandler {
       this.prevCC = frag.cc;
     }
     // Parse the WebVTT file contents.
-    WebVTTParser.parse(payload, this.initPTS[frag.cc], vttCCs, frag.cc, function (cues) {
-      const currentTrack = textTracks[frag.level];
-      // WebVTTParser.parse is an async method and if the currently selected text track mode is set to "disabled"
-      // before parsing is done then don't try to access currentTrack.cues.getCueById as cues will be null
-      // and trying to access getCueById method of cues will throw an exception
-      if (currentTrack.mode === 'disabled') {
-        hls.trigger(Event.SUBTITLE_FRAG_PROCESSED, { success: false, frag: frag });
-        return;
-      }     
-      let minStartTime = Number.MAX_SAFE_INTEGER;
-      // Add cues and trigger event with success true.
-      
-      cues.forEach(cue => {
-        //find the first cue in the entire cue set since its not always sorted
-        minStartTime = Math.min(cue.startTime,minStartTime);
-        // Sometimes there are cue overlaps on segmented vtts so the same
-        // cue can appear more than once in different vtt files.
-        // This avoid showing duplicated cues with same timecode and text.
-        if (!currentTrack.cues.getCueById(cue.id)) {
-          try {
-            currentTrack.addCue(cue);
-            if (!currentTrack.cues.getCueById(cue.id)) {
-              throw new Error(`addCue is failed for: ${cue}`);
+    parseWebVTT(
+      payload,
+      this.initPTS[frag.cc],
+      this.timescale[frag.cc],
+      vttCCs,
+      frag.cc,
+      frag.start,
+      (cues) => {
+        const currentTrack = textTracks[frag.level];
+        // WebVTTParser.parse is an async method and if the currently selected text track mode is set to "disabled"
+        // before parsing is done then don't try to access currentTrack.cues.getCueById as cues will be null
+        // and trying to access getCueById method of cues will throw an exception
+        if (currentTrack.mode === 'disabled') {
+          hls.trigger(Event.SUBTITLE_FRAG_PROCESSED, { success: false, frag: frag });
+          return;
+        }     
+        let minStartTime = Number.MAX_SAFE_INTEGER;
+        // Add cues and trigger event with success true.
+        
+        cues.forEach(cue => {
+          //find the first cue in the entire cue set since its not always sorted
+          minStartTime = Math.min(cue.startTime,minStartTime);
+          // Sometimes there are cue overlaps on segmented vtts so the same
+          // cue can appear more than once in different vtt files.
+          // This avoid showing duplicated cues with same timecode and text.
+          if (!currentTrack.cues.getCueById(cue.id)) {
+            try {
+              currentTrack.addCue(cue);
+              if (!currentTrack.cues.getCueById(cue.id)) {
+                throw new Error(`addCue is failed for: ${cue}`);
+              }
+            } catch (err) {
+              logger.debug(`Failed occurred on adding cues: ${err}`);
+              const textTrackCue = new (window as any).TextTrackCue(cue.startTime, cue.endTime, cue.text);
+              textTrackCue.id = cue.id;
+              currentTrack.addCue(textTrackCue);
             }
-          } catch (err) {
-            logger.debug(`Failed occurred on adding cues: ${err}`);
-            const textTrackCue = new (window as any).TextTrackCue(cue.startTime, cue.endTime, cue.text);
-            textTrackCue.id = cue.id;
-            currentTrack.addCue(textTrackCue);
+          }
+        }         
+        );
+        
+        let liveSyncPosition = hls.streamController.liveSyncPosition;
+        //need to remove cues only for live so if there is no sync position its a VOD
+        // if there is a better way to detect live vs vod we can use it. 
+        while (cues.length > 0 && liveSyncPosition !== undefined ){
+          //We remove cues which are more than 5 minutes old than the current cue
+          if (currentTrack.cues[0].startTime < minStartTime - 300){
+            currentTrack.removeCue(currentTrack.cues[0]);
+          } else {
+            break;
           }
         }
-      }         
-      );
-      
-      let liveSyncPosition = hls.streamController.liveSyncPosition;
-      //need to remove cues only for live so if there is no sync position its a VOD
-      // if there is a better way to detect live vs vod we can use it. 
-      while (cues.length > 0 && liveSyncPosition !== undefined ){
-        //We remove cues which are more than 5 minutes old than the current cue
-        if (currentTrack.cues[0].startTime < minStartTime - 300){
-          currentTrack.removeCue(currentTrack.cues[0]);
-        } else {
-          break;
-        }
+        hls.trigger(Event.SUBTITLE_FRAG_PROCESSED, { success: true, frag: frag });
+      },
+      (error) => {
+        // Something went wrong while parsing. Trigger event with success false.
+        logger.log(`Failed to parse VTT cue: ${error}`);
+        hls.trigger(Event.SUBTITLE_FRAG_PROCESSED, { success: false, frag: frag });
       }
-      hls.trigger(Event.SUBTITLE_FRAG_PROCESSED, { success: true, frag: frag });
-    },
-    function (e) {
-      // Something went wrong while parsing. Trigger event with success false.
-      logger.log(`Failed to parse VTT cue: ${e}`);
-      hls.trigger(Event.SUBTITLE_FRAG_PROCESSED, { success: false, frag: frag });
-    });
+    );
   }
 
   onFragDecrypted (data: { frag: Fragment, payload: any}) {

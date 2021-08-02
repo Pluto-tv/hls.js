@@ -1288,9 +1288,9 @@ function () {
 /***/ }),
 
 /***/ "./src/demux/demuxer-inline.js":
-/*!**************************************************!*\
-  !*** ./src/demux/demuxer-inline.js + 12 modules ***!
-  \**************************************************/
+/*!*************************************************!*\
+  !*** ./src/demux/demuxer-inline.js + 8 modules ***!
+  \*************************************************/
 /*! exports provided: default */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/crypt/decrypter.js because of ./src/hls.ts */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/demux/id3.js because of ./src/hls.ts */
@@ -1298,6 +1298,7 @@ function () {
 /*! ModuleConcatenation bailout: Cannot concat with ./src/errors.ts because of ./src/hls.ts */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/events.js because of ./src/hls.ts */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/polyfills/number-isFinite.js because of ./src/hls.ts */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/remux/mp4-remuxer.js because of ./src/hls.ts */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/utils/get-self-scope.js because of ./src/hls.ts */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/utils/logger.js because of ./src/hls.ts */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -3734,1456 +3735,9 @@ function () {
 }();
 
 /* harmony default export */ var mp3demuxer = (mp3demuxer_MP3Demuxer);
-// CONCATENATED MODULE: ./src/remux/aac-helper.js
-/**
- *  AAC helper
- */
-var AAC =
-/*#__PURE__*/
-function () {
-  function AAC() {}
+// EXTERNAL MODULE: ./src/remux/mp4-remuxer.js + 2 modules
+var mp4_remuxer = __webpack_require__("./src/remux/mp4-remuxer.js");
 
-  AAC.getSilentFrame = function getSilentFrame(codec, channelCount) {
-    switch (codec) {
-      case 'mp4a.40.2':
-        if (channelCount === 1) {
-          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x23, 0x80]);
-        } else if (channelCount === 2) {
-          return new Uint8Array([0x21, 0x00, 0x49, 0x90, 0x02, 0x19, 0x00, 0x23, 0x80]);
-        } else if (channelCount === 3) {
-          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x8e]);
-        } else if (channelCount === 4) {
-          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x80, 0x2c, 0x80, 0x08, 0x02, 0x38]);
-        } else if (channelCount === 5) {
-          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x82, 0x30, 0x04, 0x99, 0x00, 0x21, 0x90, 0x02, 0x38]);
-        } else if (channelCount === 6) {
-          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x82, 0x30, 0x04, 0x99, 0x00, 0x21, 0x90, 0x02, 0x00, 0xb2, 0x00, 0x20, 0x08, 0xe0]);
-        }
-
-        break;
-      // handle HE-AAC below (mp4a.40.5 / mp4a.40.29)
-
-      default:
-        if (channelCount === 1) {
-          // ffmpeg -y -f lavfi -i "aevalsrc=0:d=0.05" -c:a libfdk_aac -profile:a aac_he -b:a 4k output.aac && hexdump -v -e '16/1 "0x%x," "\n"' -v output.aac
-          return new Uint8Array([0x1, 0x40, 0x22, 0x80, 0xa3, 0x4e, 0xe6, 0x80, 0xba, 0x8, 0x0, 0x0, 0x0, 0x1c, 0x6, 0xf1, 0xc1, 0xa, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5e]);
-        } else if (channelCount === 2) {
-          // ffmpeg -y -f lavfi -i "aevalsrc=0|0:d=0.05" -c:a libfdk_aac -profile:a aac_he_v2 -b:a 4k output.aac && hexdump -v -e '16/1 "0x%x," "\n"' -v output.aac
-          return new Uint8Array([0x1, 0x40, 0x22, 0x80, 0xa3, 0x5e, 0xe6, 0x80, 0xba, 0x8, 0x0, 0x0, 0x0, 0x0, 0x95, 0x0, 0x6, 0xf1, 0xa1, 0xa, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5e]);
-        } else if (channelCount === 3) {
-          // ffmpeg -y -f lavfi -i "aevalsrc=0|0|0:d=0.05" -c:a libfdk_aac -profile:a aac_he_v2 -b:a 4k output.aac && hexdump -v -e '16/1 "0x%x," "\n"' -v output.aac
-          return new Uint8Array([0x1, 0x40, 0x22, 0x80, 0xa3, 0x5e, 0xe6, 0x80, 0xba, 0x8, 0x0, 0x0, 0x0, 0x0, 0x95, 0x0, 0x6, 0xf1, 0xa1, 0xa, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5e]);
-        }
-
-        break;
-    }
-
-    return null;
-  };
-
-  return AAC;
-}();
-
-/* harmony default export */ var aac_helper = (AAC);
-// CONCATENATED MODULE: ./src/remux/mp4-generator.js
-/**
- * Generate MP4 Box
-*/
-var UINT32_MAX = Math.pow(2, 32) - 1;
-
-var MP4 =
-/*#__PURE__*/
-function () {
-  function MP4() {}
-
-  MP4.init = function init() {
-    MP4.types = {
-      avc1: [],
-      // codingname
-      avcC: [],
-      btrt: [],
-      dinf: [],
-      dref: [],
-      esds: [],
-      ftyp: [],
-      hdlr: [],
-      mdat: [],
-      mdhd: [],
-      mdia: [],
-      mfhd: [],
-      minf: [],
-      moof: [],
-      moov: [],
-      mp4a: [],
-      '.mp3': [],
-      mvex: [],
-      mvhd: [],
-      pasp: [],
-      sdtp: [],
-      stbl: [],
-      stco: [],
-      stsc: [],
-      stsd: [],
-      stsz: [],
-      stts: [],
-      tfdt: [],
-      tfhd: [],
-      traf: [],
-      trak: [],
-      trun: [],
-      trex: [],
-      tkhd: [],
-      vmhd: [],
-      smhd: []
-    };
-    var i;
-
-    for (i in MP4.types) {
-      if (MP4.types.hasOwnProperty(i)) {
-        MP4.types[i] = [i.charCodeAt(0), i.charCodeAt(1), i.charCodeAt(2), i.charCodeAt(3)];
-      }
-    }
-
-    var videoHdlr = new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x00, // pre_defined
-    0x76, 0x69, 0x64, 0x65, // handler_type: 'vide'
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x56, 0x69, 0x64, 0x65, 0x6f, 0x48, 0x61, 0x6e, 0x64, 0x6c, 0x65, 0x72, 0x00 // name: 'VideoHandler'
-    ]);
-    var audioHdlr = new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x00, // pre_defined
-    0x73, 0x6f, 0x75, 0x6e, // handler_type: 'soun'
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x53, 0x6f, 0x75, 0x6e, 0x64, 0x48, 0x61, 0x6e, 0x64, 0x6c, 0x65, 0x72, 0x00 // name: 'SoundHandler'
-    ]);
-    MP4.HDLR_TYPES = {
-      'video': videoHdlr,
-      'audio': audioHdlr
-    };
-    var dref = new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x01, // entry_count
-    0x00, 0x00, 0x00, 0x0c, // entry_size
-    0x75, 0x72, 0x6c, 0x20, // 'url' type
-    0x00, // version 0
-    0x00, 0x00, 0x01 // entry_flags
-    ]);
-    var stco = new Uint8Array([0x00, // version
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x00 // entry_count
-    ]);
-    MP4.STTS = MP4.STSC = MP4.STCO = stco;
-    MP4.STSZ = new Uint8Array([0x00, // version
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x00, // sample_size
-    0x00, 0x00, 0x00, 0x00 // sample_count
-    ]);
-    MP4.VMHD = new Uint8Array([0x00, // version
-    0x00, 0x00, 0x01, // flags
-    0x00, 0x00, // graphicsmode
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // opcolor
-    ]);
-    MP4.SMHD = new Uint8Array([0x00, // version
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, // balance
-    0x00, 0x00 // reserved
-    ]);
-    MP4.STSD = new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x01]); // entry_count
-
-    var majorBrand = new Uint8Array([105, 115, 111, 109]); // isom
-
-    var avc1Brand = new Uint8Array([97, 118, 99, 49]); // avc1
-
-    var minorVersion = new Uint8Array([0, 0, 0, 1]);
-    MP4.FTYP = MP4.box(MP4.types.ftyp, majorBrand, minorVersion, majorBrand, avc1Brand);
-    MP4.DINF = MP4.box(MP4.types.dinf, MP4.box(MP4.types.dref, dref));
-  };
-
-  MP4.box = function box(type) {
-    var payload = Array.prototype.slice.call(arguments, 1),
-        size = 8,
-        i = payload.length,
-        len = i,
-        result; // calculate the total size we need to allocate
-
-    while (i--) {
-      size += payload[i].byteLength;
-    }
-
-    result = new Uint8Array(size);
-    result[0] = size >> 24 & 0xff;
-    result[1] = size >> 16 & 0xff;
-    result[2] = size >> 8 & 0xff;
-    result[3] = size & 0xff;
-    result.set(type, 4); // copy the payload into the result
-
-    for (i = 0, size = 8; i < len; i++) {
-      // copy payload[i] array @ offset size
-      result.set(payload[i], size);
-      size += payload[i].byteLength;
-    }
-
-    return result;
-  };
-
-  MP4.hdlr = function hdlr(type) {
-    return MP4.box(MP4.types.hdlr, MP4.HDLR_TYPES[type]);
-  };
-
-  MP4.mdat = function mdat(data) {
-    return MP4.box(MP4.types.mdat, data);
-  };
-
-  MP4.mdhd = function mdhd(timescale, duration) {
-    duration *= timescale;
-    var upperWordDuration = Math.floor(duration / (UINT32_MAX + 1));
-    var lowerWordDuration = Math.floor(duration % (UINT32_MAX + 1));
-    return MP4.box(MP4.types.mdhd, new Uint8Array([0x01, // version 1
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // creation_time
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, // modification_time
-    timescale >> 24 & 0xFF, timescale >> 16 & 0xFF, timescale >> 8 & 0xFF, timescale & 0xFF, // timescale
-    upperWordDuration >> 24, upperWordDuration >> 16 & 0xFF, upperWordDuration >> 8 & 0xFF, upperWordDuration & 0xFF, lowerWordDuration >> 24, lowerWordDuration >> 16 & 0xFF, lowerWordDuration >> 8 & 0xFF, lowerWordDuration & 0xFF, 0x55, 0xc4, // 'und' language (undetermined)
-    0x00, 0x00]));
-  };
-
-  MP4.mdia = function mdia(track) {
-    return MP4.box(MP4.types.mdia, MP4.mdhd(track.timescale, track.duration), MP4.hdlr(track.type), MP4.minf(track));
-  };
-
-  MP4.mfhd = function mfhd(sequenceNumber) {
-    return MP4.box(MP4.types.mfhd, new Uint8Array([0x00, 0x00, 0x00, 0x00, // flags
-    sequenceNumber >> 24, sequenceNumber >> 16 & 0xFF, sequenceNumber >> 8 & 0xFF, sequenceNumber & 0xFF // sequence_number
-    ]));
-  };
-
-  MP4.minf = function minf(track) {
-    if (track.type === 'audio') {
-      return MP4.box(MP4.types.minf, MP4.box(MP4.types.smhd, MP4.SMHD), MP4.DINF, MP4.stbl(track));
-    } else {
-      return MP4.box(MP4.types.minf, MP4.box(MP4.types.vmhd, MP4.VMHD), MP4.DINF, MP4.stbl(track));
-    }
-  };
-
-  MP4.moof = function moof(sn, baseMediaDecodeTime, track) {
-    return MP4.box(MP4.types.moof, MP4.mfhd(sn), MP4.traf(track, baseMediaDecodeTime));
-  }
-  /**
-  * @param tracks... (optional) {array} the tracks associated with this movie
-  */
-  ;
-
-  MP4.moov = function moov(tracks) {
-    var i = tracks.length,
-        boxes = [];
-
-    while (i--) {
-      boxes[i] = MP4.trak(tracks[i]);
-    }
-
-    return MP4.box.apply(null, [MP4.types.moov, MP4.mvhd(tracks[0].timescale, tracks[0].duration)].concat(boxes).concat(MP4.mvex(tracks)));
-  };
-
-  MP4.mvex = function mvex(tracks) {
-    var i = tracks.length,
-        boxes = [];
-
-    while (i--) {
-      boxes[i] = MP4.trex(tracks[i]);
-    }
-
-    return MP4.box.apply(null, [MP4.types.mvex].concat(boxes));
-  };
-
-  MP4.mvhd = function mvhd(timescale, duration) {
-    duration *= timescale;
-    var upperWordDuration = Math.floor(duration / (UINT32_MAX + 1));
-    var lowerWordDuration = Math.floor(duration % (UINT32_MAX + 1));
-    var bytes = new Uint8Array([0x01, // version 1
-    0x00, 0x00, 0x00, // flags
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // creation_time
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, // modification_time
-    timescale >> 24 & 0xFF, timescale >> 16 & 0xFF, timescale >> 8 & 0xFF, timescale & 0xFF, // timescale
-    upperWordDuration >> 24, upperWordDuration >> 16 & 0xFF, upperWordDuration >> 8 & 0xFF, upperWordDuration & 0xFF, lowerWordDuration >> 24, lowerWordDuration >> 16 & 0xFF, lowerWordDuration >> 8 & 0xFF, lowerWordDuration & 0xFF, 0x00, 0x01, 0x00, 0x00, // 1.0 rate
-    0x01, 0x00, // 1.0 volume
-    0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, // transformation: unity matrix
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // pre_defined
-    0xff, 0xff, 0xff, 0xff // next_track_ID
-    ]);
-    return MP4.box(MP4.types.mvhd, bytes);
-  };
-
-  MP4.sdtp = function sdtp(track) {
-    var samples = track.samples || [],
-        bytes = new Uint8Array(4 + samples.length),
-        flags,
-        i; // leave the full box header (4 bytes) all zero
-    // write the sample table
-
-    for (i = 0; i < samples.length; i++) {
-      flags = samples[i].flags;
-      bytes[i + 4] = flags.dependsOn << 4 | flags.isDependedOn << 2 | flags.hasRedundancy;
-    }
-
-    return MP4.box(MP4.types.sdtp, bytes);
-  };
-
-  MP4.stbl = function stbl(track) {
-    return MP4.box(MP4.types.stbl, MP4.stsd(track), MP4.box(MP4.types.stts, MP4.STTS), MP4.box(MP4.types.stsc, MP4.STSC), MP4.box(MP4.types.stsz, MP4.STSZ), MP4.box(MP4.types.stco, MP4.STCO));
-  };
-
-  MP4.avc1 = function avc1(track) {
-    var sps = [],
-        pps = [],
-        i,
-        data,
-        len; // assemble the SPSs
-
-    for (i = 0; i < track.sps.length; i++) {
-      data = track.sps[i];
-      len = data.byteLength;
-      sps.push(len >>> 8 & 0xFF);
-      sps.push(len & 0xFF); // SPS
-
-      sps = sps.concat(Array.prototype.slice.call(data));
-    } // assemble the PPSs
-
-
-    for (i = 0; i < track.pps.length; i++) {
-      data = track.pps[i];
-      len = data.byteLength;
-      pps.push(len >>> 8 & 0xFF);
-      pps.push(len & 0xFF);
-      pps = pps.concat(Array.prototype.slice.call(data));
-    }
-
-    var avcc = MP4.box(MP4.types.avcC, new Uint8Array([0x01, // version
-    sps[3], // profile
-    sps[4], // profile compat
-    sps[5], // level
-    0xfc | 3, // lengthSizeMinusOne, hard-coded to 4 bytes
-    0xE0 | track.sps.length // 3bit reserved (111) + numOfSequenceParameterSets
-    ].concat(sps).concat([track.pps.length // numOfPictureParameterSets
-    ]).concat(pps))),
-        // "PPS"
-    width = track.width,
-        height = track.height,
-        hSpacing = track.pixelRatio[0],
-        vSpacing = track.pixelRatio[1];
-    return MP4.box(MP4.types.avc1, new Uint8Array([0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, // reserved
-    0x00, 0x01, // data_reference_index
-    0x00, 0x00, // pre_defined
-    0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // pre_defined
-    width >> 8 & 0xFF, width & 0xff, // width
-    height >> 8 & 0xFF, height & 0xff, // height
-    0x00, 0x48, 0x00, 0x00, // horizresolution
-    0x00, 0x48, 0x00, 0x00, // vertresolution
-    0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x01, // frame_count
-    0x12, 0x64, 0x61, 0x69, 0x6C, // dailymotion/hls.js
-    0x79, 0x6D, 0x6F, 0x74, 0x69, 0x6F, 0x6E, 0x2F, 0x68, 0x6C, 0x73, 0x2E, 0x6A, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // compressorname
-    0x00, 0x18, // depth = 24
-    0x11, 0x11]), // pre_defined = -1
-    avcc, MP4.box(MP4.types.btrt, new Uint8Array([0x00, 0x1c, 0x9c, 0x80, // bufferSizeDB
-    0x00, 0x2d, 0xc6, 0xc0, // maxBitrate
-    0x00, 0x2d, 0xc6, 0xc0])), // avgBitrate
-    MP4.box(MP4.types.pasp, new Uint8Array([hSpacing >> 24, // hSpacing
-    hSpacing >> 16 & 0xFF, hSpacing >> 8 & 0xFF, hSpacing & 0xFF, vSpacing >> 24, // vSpacing
-    vSpacing >> 16 & 0xFF, vSpacing >> 8 & 0xFF, vSpacing & 0xFF])));
-  };
-
-  MP4.esds = function esds(track) {
-    var configlen = track.config.length;
-    return new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    0x03, // descriptor_type
-    0x17 + configlen, // length
-    0x00, 0x01, // es_id
-    0x00, // stream_priority
-    0x04, // descriptor_type
-    0x0f + configlen, // length
-    0x40, // codec : mpeg4_audio
-    0x15, // stream_type
-    0x00, 0x00, 0x00, // buffer_size
-    0x00, 0x00, 0x00, 0x00, // maxBitrate
-    0x00, 0x00, 0x00, 0x00, // avgBitrate
-    0x05 // descriptor_type
-    ].concat([configlen]).concat(track.config).concat([0x06, 0x01, 0x02])); // GASpecificConfig)); // length + audio config descriptor
-  };
-
-  MP4.mp4a = function mp4a(track) {
-    var samplerate = track.samplerate;
-    return MP4.box(MP4.types.mp4a, new Uint8Array([0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, // reserved
-    0x00, 0x01, // data_reference_index
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, track.channelCount, // channelcount
-    0x00, 0x10, // sampleSize:16bits
-    0x00, 0x00, 0x00, 0x00, // reserved2
-    samplerate >> 8 & 0xFF, samplerate & 0xff, //
-    0x00, 0x00]), MP4.box(MP4.types.esds, MP4.esds(track)));
-  };
-
-  MP4.mp3 = function mp3(track) {
-    var samplerate = track.samplerate;
-    return MP4.box(MP4.types['.mp3'], new Uint8Array([0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, 0x00, // reserved
-    0x00, 0x01, // data_reference_index
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, track.channelCount, // channelcount
-    0x00, 0x10, // sampleSize:16bits
-    0x00, 0x00, 0x00, 0x00, // reserved2
-    samplerate >> 8 & 0xFF, samplerate & 0xff, //
-    0x00, 0x00]));
-  };
-
-  MP4.stsd = function stsd(track) {
-    if (track.type === 'audio') {
-      if (!track.isAAC && track.codec === 'mp3') {
-        return MP4.box(MP4.types.stsd, MP4.STSD, MP4.mp3(track));
-      }
-
-      return MP4.box(MP4.types.stsd, MP4.STSD, MP4.mp4a(track));
-    } else {
-      return MP4.box(MP4.types.stsd, MP4.STSD, MP4.avc1(track));
-    }
-  };
-
-  MP4.tkhd = function tkhd(track) {
-    var id = track.id,
-        duration = track.duration * track.timescale,
-        width = track.width,
-        height = track.height,
-        upperWordDuration = Math.floor(duration / (UINT32_MAX + 1)),
-        lowerWordDuration = Math.floor(duration % (UINT32_MAX + 1));
-    return MP4.box(MP4.types.tkhd, new Uint8Array([0x01, // version 1
-    0x00, 0x00, 0x07, // flags
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // creation_time
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, // modification_time
-    id >> 24 & 0xFF, id >> 16 & 0xFF, id >> 8 & 0xFF, id & 0xFF, // track_ID
-    0x00, 0x00, 0x00, 0x00, // reserved
-    upperWordDuration >> 24, upperWordDuration >> 16 & 0xFF, upperWordDuration >> 8 & 0xFF, upperWordDuration & 0xFF, lowerWordDuration >> 24, lowerWordDuration >> 16 & 0xFF, lowerWordDuration >> 8 & 0xFF, lowerWordDuration & 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // reserved
-    0x00, 0x00, // layer
-    0x00, 0x00, // alternate_group
-    0x00, 0x00, // non-audio track volume
-    0x00, 0x00, // reserved
-    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, // transformation: unity matrix
-    width >> 8 & 0xFF, width & 0xFF, 0x00, 0x00, // width
-    height >> 8 & 0xFF, height & 0xFF, 0x00, 0x00 // height
-    ]));
-  };
-
-  MP4.traf = function traf(track, baseMediaDecodeTime) {
-    var sampleDependencyTable = MP4.sdtp(track),
-        id = track.id,
-        upperWordBaseMediaDecodeTime = Math.floor(baseMediaDecodeTime / (UINT32_MAX + 1)),
-        lowerWordBaseMediaDecodeTime = Math.floor(baseMediaDecodeTime % (UINT32_MAX + 1));
-    return MP4.box(MP4.types.traf, MP4.box(MP4.types.tfhd, new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    id >> 24, id >> 16 & 0XFF, id >> 8 & 0XFF, id & 0xFF])), MP4.box(MP4.types.tfdt, new Uint8Array([0x01, // version 1
-    0x00, 0x00, 0x00, // flags
-    upperWordBaseMediaDecodeTime >> 24, upperWordBaseMediaDecodeTime >> 16 & 0XFF, upperWordBaseMediaDecodeTime >> 8 & 0XFF, upperWordBaseMediaDecodeTime & 0xFF, lowerWordBaseMediaDecodeTime >> 24, lowerWordBaseMediaDecodeTime >> 16 & 0XFF, lowerWordBaseMediaDecodeTime >> 8 & 0XFF, lowerWordBaseMediaDecodeTime & 0xFF])), MP4.trun(track, sampleDependencyTable.length + 16 + // tfhd
-    20 + // tfdt
-    8 + // traf header
-    16 + // mfhd
-    8 + // moof header
-    8), // mdat header
-    sampleDependencyTable);
-  }
-  /**
-   * Generate a track box.
-   * @param track {object} a track definition
-   * @return {Uint8Array} the track box
-   */
-  ;
-
-  MP4.trak = function trak(track) {
-    track.duration = track.duration || 0xffffffff;
-    return MP4.box(MP4.types.trak, MP4.tkhd(track), MP4.mdia(track));
-  };
-
-  MP4.trex = function trex(track) {
-    var id = track.id;
-    return MP4.box(MP4.types.trex, new Uint8Array([0x00, // version 0
-    0x00, 0x00, 0x00, // flags
-    id >> 24, id >> 16 & 0XFF, id >> 8 & 0XFF, id & 0xFF, // track_ID
-    0x00, 0x00, 0x00, 0x01, // default_sample_description_index
-    0x00, 0x00, 0x00, 0x00, // default_sample_duration
-    0x00, 0x00, 0x00, 0x00, // default_sample_size
-    0x00, 0x01, 0x00, 0x01 // default_sample_flags
-    ]));
-  };
-
-  MP4.trun = function trun(track, offset) {
-    var samples = track.samples || [],
-        len = samples.length,
-        arraylen = 12 + 16 * len,
-        array = new Uint8Array(arraylen),
-        i,
-        sample,
-        duration,
-        size,
-        flags,
-        cts;
-    offset += 8 + arraylen;
-    array.set([0x00, // version 0
-    0x00, 0x0f, 0x01, // flags
-    len >>> 24 & 0xFF, len >>> 16 & 0xFF, len >>> 8 & 0xFF, len & 0xFF, // sample_count
-    offset >>> 24 & 0xFF, offset >>> 16 & 0xFF, offset >>> 8 & 0xFF, offset & 0xFF // data_offset
-    ], 0);
-
-    for (i = 0; i < len; i++) {
-      sample = samples[i];
-      duration = sample.duration;
-      size = sample.size;
-      flags = sample.flags;
-      cts = sample.cts;
-      array.set([duration >>> 24 & 0xFF, duration >>> 16 & 0xFF, duration >>> 8 & 0xFF, duration & 0xFF, // sample_duration
-      size >>> 24 & 0xFF, size >>> 16 & 0xFF, size >>> 8 & 0xFF, size & 0xFF, // sample_size
-      flags.isLeading << 2 | flags.dependsOn, flags.isDependedOn << 6 | flags.hasRedundancy << 4 | flags.paddingValue << 1 | flags.isNonSync, flags.degradPrio & 0xF0 << 8, flags.degradPrio & 0x0F, // sample_flags
-      cts >>> 24 & 0xFF, cts >>> 16 & 0xFF, cts >>> 8 & 0xFF, cts & 0xFF // sample_composition_time_offset
-      ], 12 + 16 * i);
-    }
-
-    return MP4.box(MP4.types.trun, array);
-  };
-
-  MP4.initSegment = function initSegment(tracks) {
-    if (!MP4.types) {
-      MP4.init();
-    }
-
-    var movie = MP4.moov(tracks),
-        result;
-    result = new Uint8Array(MP4.FTYP.byteLength + movie.byteLength);
-    result.set(MP4.FTYP);
-    result.set(movie, MP4.FTYP.byteLength);
-    return result;
-  };
-
-  return MP4;
-}();
-
-/* harmony default export */ var mp4_generator = (MP4);
-// CONCATENATED MODULE: ./src/utils/timescale-conversion.ts
-var MPEG_TS_CLOCK_FREQ_HZ = 90000;
-function toTimescaleFromScale(value, destScale, srcScale, round) {
-  if (srcScale === void 0) {
-    srcScale = 1;
-  }
-
-  if (round === void 0) {
-    round = false;
-  }
-
-  return toTimescaleFromBase(value, destScale, 1 / srcScale);
-}
-function toTimescaleFromBase(value, destScale, srcBase, round) {
-  if (srcBase === void 0) {
-    srcBase = 1;
-  }
-
-  if (round === void 0) {
-    round = false;
-  }
-
-  var result = value * destScale * srcBase; // equivalent to `(value * scale) / (1 / base)`
-
-  return round ? Math.round(result) : result;
-}
-function toMsFromMpegTsClock(value, round) {
-  if (round === void 0) {
-    round = false;
-  }
-
-  return toTimescaleFromBase(value, 1000, 1 / MPEG_TS_CLOCK_FREQ_HZ, round);
-}
-function toMpegTsClockFromTimescale(value, srcScale) {
-  if (srcScale === void 0) {
-    srcScale = 1;
-  }
-
-  return toTimescaleFromBase(value, MPEG_TS_CLOCK_FREQ_HZ, 1 / srcScale);
-}
-// CONCATENATED MODULE: ./src/remux/mp4-remuxer.js
-/**
- * fMP4 remuxer
-*/
-
-
-
-
-
-
-var MAX_SILENT_FRAME_DURATION_90KHZ = toMpegTsClockFromTimescale(10);
-var PTS_DTS_SHIFT_TOLERANCE_90KHZ = toMpegTsClockFromTimescale(0.2);
-
-var mp4_remuxer_MP4Remuxer =
-/*#__PURE__*/
-function () {
-  function MP4Remuxer(observer, config, typeSupported, vendor) {
-    this.observer = observer;
-    this.config = config;
-    this.typeSupported = typeSupported;
-    var userAgent = navigator.userAgent;
-    this.isSafari = vendor && vendor.indexOf('Apple') > -1 && userAgent && !userAgent.match('CriOS');
-    this.ISGenerated = false;
-  }
-
-  var _proto = MP4Remuxer.prototype;
-
-  _proto.destroy = function destroy() {};
-
-  _proto.resetTimeStamp = function resetTimeStamp(defaultTimeStamp) {
-    this._initPTS = this._initDTS = defaultTimeStamp;
-  };
-
-  _proto.resetInitSegment = function resetInitSegment() {
-    this.ISGenerated = false;
-  };
-
-  _proto.remux = function remux(audioTrack, videoTrack, id3Track, textTrack, timeOffset, contiguous, accurateTimeOffset) {
-    // generate Init Segment if needed
-    if (!this.ISGenerated) {
-      this.generateIS(audioTrack, videoTrack, timeOffset);
-    }
-
-    if (this.ISGenerated) {
-      var nbAudioSamples = audioTrack.samples.length;
-      var nbVideoSamples = videoTrack.samples.length;
-      var audioTimeOffset = timeOffset;
-      var videoTimeOffset = timeOffset;
-
-      if (nbAudioSamples && nbVideoSamples) {
-        // timeOffset is expected to be the offset of the first timestamp of this fragment (first DTS)
-        // if first audio DTS is not aligned with first video DTS then we need to take that into account
-        // when providing timeOffset to remuxAudio / remuxVideo. if we don't do that, there might be a permanent / small
-        // drift between audio and video streams
-        var audiovideoDeltaDts = (audioTrack.samples[0].pts - videoTrack.samples[0].pts) / videoTrack.inputTimeScale;
-        audioTimeOffset += Math.max(0, audiovideoDeltaDts);
-        videoTimeOffset += Math.max(0, -audiovideoDeltaDts);
-      } // Purposefully remuxing audio before video, so that remuxVideo can use nextAudioPts, which is
-      // calculated in remuxAudio.
-      // logger.log('nb AAC samples:' + audioTrack.samples.length);
-
-
-      if (nbAudioSamples) {
-        // if initSegment was generated without video samples, regenerate it again
-        if (!audioTrack.timescale) {
-          logger["logger"].warn('regenerate InitSegment as audio detected');
-          this.generateIS(audioTrack, videoTrack, timeOffset);
-        }
-
-        var audioData = this.remuxAudio(audioTrack, audioTimeOffset, contiguous, accurateTimeOffset); // logger.log('nb AVC samples:' + videoTrack.samples.length);
-
-        if (nbVideoSamples) {
-          var audioTrackLength;
-
-          if (audioData) {
-            audioTrackLength = audioData.endPTS - audioData.startPTS;
-          } // if initSegment was generated without video samples, regenerate it again
-
-
-          if (!videoTrack.timescale) {
-            logger["logger"].warn('regenerate InitSegment as video detected');
-            this.generateIS(audioTrack, videoTrack, timeOffset);
-          }
-
-          this.remuxVideo(videoTrack, videoTimeOffset, contiguous, audioTrackLength, accurateTimeOffset);
-        }
-      } else {
-        // logger.log('nb AVC samples:' + videoTrack.samples.length);
-        if (nbVideoSamples) {
-          var videoData = this.remuxVideo(videoTrack, videoTimeOffset, contiguous, 0, accurateTimeOffset);
-
-          if (videoData && audioTrack.codec) {
-            this.remuxEmptyAudio(audioTrack, audioTimeOffset, contiguous, videoData);
-          }
-        }
-      }
-    } // logger.log('nb ID3 samples:' + audioTrack.samples.length);
-
-
-    if (id3Track.samples.length) {
-      this.remuxID3(id3Track, timeOffset);
-    } // logger.log('nb ID3 samples:' + audioTrack.samples.length);
-
-
-    if (textTrack.samples.length) {
-      this.remuxText(textTrack, timeOffset);
-    } // notify end of parsing
-
-
-    this.observer.trigger(events["default"].FRAG_PARSED);
-  };
-
-  _proto.generateIS = function generateIS(audioTrack, videoTrack, timeOffset) {
-    var observer = this.observer,
-        audioSamples = audioTrack.samples,
-        videoSamples = videoTrack.samples,
-        typeSupported = this.typeSupported,
-        container = 'audio/mp4',
-        tracks = {},
-        data = {
-      tracks: tracks
-    },
-        computePTSDTS = this._initPTS === undefined,
-        initPTS,
-        initDTS;
-
-    if (computePTSDTS) {
-      initPTS = initDTS = Infinity;
-    }
-
-    if (audioTrack.config && audioSamples.length) {
-      // let's use audio sampling rate as MP4 time scale.
-      // rationale is that there is a integer nb of audio frames per audio sample (1024 for AAC)
-      // using audio sampling rate here helps having an integer MP4 frame duration
-      // this avoids potential rounding issue and AV sync issue
-      audioTrack.timescale = audioTrack.samplerate;
-      logger["logger"].log("audio sampling rate : " + audioTrack.samplerate);
-
-      if (!audioTrack.isAAC) {
-        if (typeSupported.mpeg) {
-          // Chrome and Safari
-          container = 'audio/mpeg';
-          audioTrack.codec = '';
-        } else if (typeSupported.mp3) {
-          // Firefox
-          audioTrack.codec = 'mp3';
-        }
-      }
-
-      tracks.audio = {
-        container: container,
-        codec: audioTrack.codec,
-        initSegment: !audioTrack.isAAC && typeSupported.mpeg ? new Uint8Array() : mp4_generator.initSegment([audioTrack]),
-        metadata: {
-          channelCount: audioTrack.channelCount
-        }
-      };
-
-      if (computePTSDTS) {
-        // remember first PTS of this demuxing context. for audio, PTS = DTS
-        initPTS = initDTS = audioSamples[0].pts - audioTrack.inputTimeScale * timeOffset;
-      }
-    }
-
-    if (videoTrack.sps && videoTrack.pps && videoSamples.length) {
-      // let's use input time scale as MP4 video timescale
-      // we use input time scale straight away to avoid rounding issues on frame duration / cts computation
-      var inputTimeScale = videoTrack.inputTimeScale;
-      videoTrack.timescale = inputTimeScale;
-      tracks.video = {
-        container: 'video/mp4',
-        codec: videoTrack.codec,
-        initSegment: mp4_generator.initSegment([videoTrack]),
-        metadata: {
-          width: videoTrack.width,
-          height: videoTrack.height
-        }
-      };
-
-      if (computePTSDTS) {
-        initPTS = Math.min(initPTS, videoSamples[0].pts - inputTimeScale * timeOffset);
-        initDTS = Math.min(initDTS, videoSamples[0].dts - inputTimeScale * timeOffset);
-        this.observer.trigger(events["default"].INIT_PTS_FOUND, {
-          initPTS: initPTS
-        });
-      }
-    }
-
-    if (Object.keys(tracks).length) {
-      observer.trigger(events["default"].FRAG_PARSING_INIT_SEGMENT, data);
-      this.ISGenerated = true;
-
-      if (computePTSDTS) {
-        this._initPTS = initPTS;
-        this._initDTS = initDTS;
-      }
-    } else {
-      observer.trigger(events["default"].ERROR, {
-        type: errors["ErrorTypes"].MEDIA_ERROR,
-        details: errors["ErrorDetails"].FRAG_PARSING_ERROR,
-        fatal: false,
-        reason: 'no audio/video samples found'
-      });
-    }
-  };
-
-  _proto.remuxVideo = function remuxVideo(track, timeOffset, contiguous, audioTrackLength, accurateTimeOffset) {
-    var offset = 8;
-    var mp4SampleDuration;
-    var mdat;
-    var moof;
-    var firstPTS;
-    var firstDTS;
-    var lastPTS;
-    var lastDTS;
-    var timeScale = track.timescale;
-    var inputSamples = track.samples;
-    var outputSamples = [];
-    var nbSamples = inputSamples.length;
-    var ptsNormalize = this._PTSNormalize;
-    var initPTS = this._initPTS; // if parsed fragment is contiguous with last one, let's use last DTS value as reference
-
-    var nextAvcDts = this.nextAvcDts;
-    var isSafari = this.isSafari;
-
-    if (nbSamples === 0) {
-      return;
-    } // Safari does not like overlapping DTS on consecutive fragments. let's use nextAvcDts to overcome this if fragments are consecutive
-
-
-    if (isSafari) {
-      // also consider consecutive fragments as being contiguous (even if a level switch occurs),
-      // for sake of clarity:
-      // consecutive fragments are frags with
-      //  - less than 100ms gaps between new time offset (if accurate) and next expected PTS OR
-      //  - less than 200 ms PTS gaps (timeScale/5)
-      contiguous |= inputSamples.length && nextAvcDts && (accurateTimeOffset && Math.abs(timeOffset - nextAvcDts / timeScale) < 0.1 || Math.abs(inputSamples[0].pts - nextAvcDts - initPTS) < timeScale / 5);
-    }
-
-    if (!contiguous) {
-      // if not contiguous, let's use target timeOffset
-      nextAvcDts = timeOffset * timeScale;
-    } // PTS is coded on 33bits, and can loop from -2^32 to 2^32
-    // ptsNormalize will make PTS/DTS value monotonic, we use last known DTS value as reference value
-
-
-    inputSamples.forEach(function (sample) {
-      sample.pts = ptsNormalize(sample.pts - initPTS, nextAvcDts);
-      sample.dts = ptsNormalize(sample.dts - initPTS, nextAvcDts);
-    }); // sort video samples by DTS then PTS then demux id order
-
-    inputSamples.sort(function (a, b) {
-      var deltadts = a.dts - b.dts;
-      var deltapts = a.pts - b.pts;
-      return deltadts || deltapts || a.id - b.id;
-    }); // handle broken streams with PTS < DTS, tolerance up 0.2 seconds
-
-    var PTSDTSshift = inputSamples.reduce(function (prev, curr) {
-      return Math.max(Math.min(prev, curr.pts - curr.dts), -1 * PTS_DTS_SHIFT_TOLERANCE_90KHZ);
-    }, 0);
-
-    if (PTSDTSshift < 0) {
-      logger["logger"].warn("PTS < DTS detected in video samples, shifting DTS by " + toMsFromMpegTsClock(PTSDTSshift, true) + " ms to overcome this issue");
-
-      for (var i = 0; i < inputSamples.length; i++) {
-        inputSamples[i].dts += PTSDTSshift;
-      }
-    } // compute first DTS and last DTS, normalize them against reference value
-
-
-    var sample = inputSamples[0];
-    firstDTS = Math.max(sample.dts, 0);
-    firstPTS = Math.max(sample.pts, 0); // check timestamp continuity accross consecutive fragments (this is to remove inter-fragment gap/hole)
-
-    var delta = firstDTS - nextAvcDts; // if fragment are contiguous, detect hole/overlapping between fragments
-
-    if (contiguous) {
-      if (delta) {
-        if (delta > 1) {
-          logger["logger"].log("AVC: " + toMsFromMpegTsClock(delta, true) + " ms hole between fragments detected,filling it");
-        } else if (delta < -1) {
-          logger["logger"].log("AVC: " + toMsFromMpegTsClock(-delta, true) + " ms overlapping between fragments detected");
-        } // remove hole/gap : set DTS to next expected DTS
-
-
-        firstDTS = nextAvcDts;
-        inputSamples[0].dts = firstDTS; // offset PTS as well, ensure that PTS is smaller or equal than new DTS
-
-        firstPTS = Math.max(firstPTS - delta, nextAvcDts);
-        inputSamples[0].pts = firstPTS;
-        logger["logger"].log("Video: PTS/DTS adjusted: " + toMsFromMpegTsClock(firstPTS, true) + "/" + toMsFromMpegTsClock(firstDTS, true) + ", delta: " + toMsFromMpegTsClock(delta, true) + " ms");
-      }
-    } // compute lastPTS/lastDTS
-
-
-    sample = inputSamples[inputSamples.length - 1];
-    lastDTS = Math.max(sample.dts, 0);
-    lastPTS = Math.max(sample.pts, 0, lastDTS); // on Safari let's signal the same sample duration for all samples
-    // sample duration (as expected by trun MP4 boxes), should be the delta between sample DTS
-    // set this constant duration as being the avg delta between consecutive DTS.
-
-    if (isSafari) {
-      mp4SampleDuration = Math.round((lastDTS - firstDTS) / (inputSamples.length - 1));
-    }
-
-    var nbNalu = 0,
-        naluLen = 0;
-
-    for (var _i = 0; _i < nbSamples; _i++) {
-      // compute total/avc sample length and nb of NAL units
-      var _sample = inputSamples[_i],
-          units = _sample.units,
-          nbUnits = units.length,
-          sampleLen = 0;
-
-      for (var j = 0; j < nbUnits; j++) {
-        sampleLen += units[j].data.length;
-      }
-
-      naluLen += sampleLen;
-      nbNalu += nbUnits;
-      _sample.length = sampleLen; // normalize PTS/DTS
-
-      if (isSafari) {
-        // sample DTS is computed using a constant decoding offset (mp4SampleDuration) between samples
-        _sample.dts = firstDTS + _i * mp4SampleDuration;
-      } else {
-        // ensure sample monotonic DTS
-        _sample.dts = Math.max(_sample.dts, firstDTS);
-      } // ensure that computed value is greater or equal than sample DTS
-
-
-      _sample.pts = Math.max(_sample.pts, _sample.dts);
-    }
-    /* concatenate the video data and construct the mdat in place
-      (need 8 more bytes to fill length and mpdat type) */
-
-
-    var mdatSize = naluLen + 4 * nbNalu + 8;
-
-    try {
-      mdat = new Uint8Array(mdatSize);
-    } catch (err) {
-      this.observer.trigger(events["default"].ERROR, {
-        type: errors["ErrorTypes"].MUX_ERROR,
-        details: errors["ErrorDetails"].REMUX_ALLOC_ERROR,
-        fatal: false,
-        bytes: mdatSize,
-        reason: "fail allocating video mdat " + mdatSize
-      });
-      return;
-    }
-
-    var view = new DataView(mdat.buffer);
-    view.setUint32(0, mdatSize);
-    mdat.set(mp4_generator.types.mdat, 4);
-
-    for (var _i2 = 0; _i2 < nbSamples; _i2++) {
-      var avcSample = inputSamples[_i2],
-          avcSampleUnits = avcSample.units,
-          mp4SampleLength = 0,
-          compositionTimeOffset = void 0; // convert NALU bitstream to MP4 format (prepend NALU with size field)
-
-      for (var _j = 0, _nbUnits = avcSampleUnits.length; _j < _nbUnits; _j++) {
-        var unit = avcSampleUnits[_j],
-            unitData = unit.data,
-            unitDataLen = unit.data.byteLength;
-        view.setUint32(offset, unitDataLen);
-        offset += 4;
-        mdat.set(unitData, offset);
-        offset += unitDataLen;
-        mp4SampleLength += 4 + unitDataLen;
-      }
-
-      if (!isSafari) {
-        // expected sample duration is the Decoding Timestamp diff of consecutive samples
-        if (_i2 < nbSamples - 1) {
-          mp4SampleDuration = inputSamples[_i2 + 1].dts - avcSample.dts;
-        } else {
-          var config = this.config,
-              lastFrameDuration = avcSample.dts - inputSamples[_i2 > 0 ? _i2 - 1 : _i2].dts;
-
-          if (config.stretchShortVideoTrack) {
-            // In some cases, a segment's audio track duration may exceed the video track duration.
-            // Since we've already remuxed audio, and we know how long the audio track is, we look to
-            // see if the delta to the next segment is longer than maxBufferHole.
-            // If so, playback would potentially get stuck, so we artificially inflate
-            // the duration of the last frame to minimize any potential gap between segments.
-            var maxBufferHole = config.maxBufferHole,
-                gapTolerance = Math.floor(maxBufferHole * timeScale),
-                deltaToFrameEnd = (audioTrackLength ? firstPTS + audioTrackLength * timeScale : this.nextAudioPts) - avcSample.pts;
-
-            if (deltaToFrameEnd > gapTolerance) {
-              // We subtract lastFrameDuration from deltaToFrameEnd to try to prevent any video
-              // frame overlap. maxBufferHole should be >> lastFrameDuration anyway.
-              mp4SampleDuration = deltaToFrameEnd - lastFrameDuration;
-
-              if (mp4SampleDuration < 0) {
-                mp4SampleDuration = lastFrameDuration;
-              }
-
-              logger["logger"].log("It is approximately " + toMsFromMpegTsClock(deltaToFrameEnd, false) + " ms to the next segment; using duration " + toMsFromMpegTsClock(mp4SampleDuration, false) + " ms for the last video frame.");
-            } else {
-              mp4SampleDuration = lastFrameDuration;
-            }
-          } else {
-            mp4SampleDuration = lastFrameDuration;
-          }
-        }
-
-        compositionTimeOffset = Math.round(avcSample.pts - avcSample.dts);
-      } else {
-        compositionTimeOffset = Math.max(0, mp4SampleDuration * Math.round((avcSample.pts - avcSample.dts) / mp4SampleDuration));
-      } // console.log('PTS/DTS/initDTS/normPTS/normDTS/relative PTS : ${avcSample.pts}/${avcSample.dts}/${initDTS}/${ptsnorm}/${dtsnorm}/${(avcSample.pts/4294967296).toFixed(3)}');
-
-
-      outputSamples.push({
-        size: mp4SampleLength,
-        // constant duration
-        duration: mp4SampleDuration,
-        cts: compositionTimeOffset,
-        flags: {
-          isLeading: 0,
-          isDependedOn: 0,
-          hasRedundancy: 0,
-          degradPrio: 0,
-          dependsOn: avcSample.key ? 2 : 1,
-          isNonSync: avcSample.key ? 0 : 1
-        }
-      });
-    } // next AVC sample DTS should be equal to last sample DTS + last sample duration (in PES timescale)
-
-
-    this.nextAvcDts = lastDTS + mp4SampleDuration;
-    var dropped = track.dropped;
-    track.nbNalu = 0;
-    track.dropped = 0;
-
-    if (outputSamples.length && navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-      var flags = outputSamples[0].flags; // chrome workaround, mark first sample as being a Random Access Point to avoid sourcebuffer append issue
-      // https://code.google.com/p/chromium/issues/detail?id=229412
-
-      flags.dependsOn = 2;
-      flags.isNonSync = 0;
-    }
-
-    track.samples = outputSamples;
-    moof = mp4_generator.moof(track.sequenceNumber++, firstDTS, track);
-    track.samples = [];
-    var data = {
-      data1: moof,
-      data2: mdat,
-      startPTS: firstPTS / timeScale,
-      endPTS: (lastPTS + mp4SampleDuration) / timeScale,
-      startDTS: firstDTS / timeScale,
-      endDTS: this.nextAvcDts / timeScale,
-      type: 'video',
-      hasAudio: false,
-      hasVideo: true,
-      nb: outputSamples.length,
-      dropped: dropped
-    };
-    this.observer.trigger(events["default"].FRAG_PARSING_DATA, data);
-    return data;
-  };
-
-  _proto.remuxAudio = function remuxAudio(track, timeOffset, contiguous, accurateTimeOffset) {
-    var inputTimeScale = track.inputTimeScale;
-    var mp4timeScale = track.timescale;
-    var scaleFactor = inputTimeScale / mp4timeScale;
-    var mp4SampleDuration = track.isAAC ? 1024 : 1152;
-    var inputSampleDuration = mp4SampleDuration * scaleFactor;
-    var ptsNormalize = this._PTSNormalize;
-    var initPTS = this._initPTS;
-    var rawMPEG = !track.isAAC && this.typeSupported.mpeg;
-    var mp4Sample;
-    var fillFrame;
-    var mdat;
-    var moof;
-    var firstPTS;
-    var lastPTS;
-    var offset = rawMPEG ? 0 : 8;
-    var inputSamples = track.samples;
-    var outputSamples = [];
-    var nextAudioPts = this.nextAudioPts; // for audio samples, also consider consecutive fragments as being contiguous (even if a level switch occurs),
-    // for sake of clarity:
-    // consecutive fragments are frags with
-    //  - less than 100ms gaps between new time offset (if accurate) and next expected PTS OR
-    //  - less than 20 audio frames distance
-    // contiguous fragments are consecutive fragments from same quality level (same level, new SN = old SN + 1)
-    // this helps ensuring audio continuity
-    // and this also avoids audio glitches/cut when switching quality, or reporting wrong duration on first audio frame
-
-    contiguous |= inputSamples.length && nextAudioPts && (accurateTimeOffset && Math.abs(timeOffset - nextAudioPts / inputTimeScale) < 0.1 || Math.abs(inputSamples[0].pts - nextAudioPts - initPTS) < 20 * inputSampleDuration); // compute normalized PTS
-
-    inputSamples.forEach(function (sample) {
-      sample.pts = sample.dts = ptsNormalize(sample.pts - initPTS, timeOffset * inputTimeScale);
-    }); // filter out sample with negative PTS that are not playable anyway
-    // if we don't remove these negative samples, they will shift all audio samples forward.
-    // leading to audio overlap between current / next fragment
-
-    inputSamples = inputSamples.filter(function (sample) {
-      return sample.pts >= 0;
-    }); // in case all samples have negative PTS, and have been filtered out, return now
-
-    if (inputSamples.length === 0) {
-      return;
-    }
-
-    if (!contiguous) {
-      if (!accurateTimeOffset) {
-        // if frag are mot contiguous and if we cant trust time offset, let's use first sample PTS as next audio PTS
-        nextAudioPts = inputSamples[0].pts;
-      } else {
-        // if timeOffset is accurate, let's use it as predicted next audio PTS
-        nextAudioPts = timeOffset * inputTimeScale;
-      }
-    } // If the audio track is missing samples, the frames seem to get "left-shifted" within the
-    // resulting mp4 segment, causing sync issues and leaving gaps at the end of the audio segment.
-    // In an effort to prevent this from happening, we inject frames here where there are gaps.
-    // When possible, we inject a silent frame; when that's not possible, we duplicate the last
-    // frame.
-
-
-    if (track.isAAC) {
-      var maxAudioFramesDrift = this.config.maxAudioFramesDrift;
-
-      for (var i = 0, nextPts = nextAudioPts; i < inputSamples.length;) {
-        // First, let's see how far off this frame is from where we expect it to be
-        var sample = inputSamples[i],
-            delta;
-        var pts = sample.pts;
-        delta = pts - nextPts; // If we're overlapping by more than a duration, drop this sample
-
-        if (delta <= -maxAudioFramesDrift * inputSampleDuration) {
-          logger["logger"].warn("Dropping 1 audio frame @ " + toMsFromMpegTsClock(nextPts, true) + " ms due to " + toMsFromMpegTsClock(delta, true) + " ms overlap.");
-          inputSamples.splice(i, 1); // Don't touch nextPtsNorm or i
-        } // eslint-disable-line brace-style
-        // Insert missing frames if:
-        // 1: We're more than maxAudioFramesDrift frame away
-        // 2: Not more than MAX_SILENT_FRAME_DURATION away
-        // 3: currentTime (aka nextPtsNorm) is not 0
-        else if (delta >= maxAudioFramesDrift * inputSampleDuration && delta < MAX_SILENT_FRAME_DURATION_90KHZ && nextPts) {
-            var missing = Math.round(delta / inputSampleDuration);
-            logger["logger"].warn("Injecting " + missing + " audio frames @ " + toMsFromMpegTsClock(nextPts, true) + " ms due to " + toMsFromMpegTsClock(nextPts, true) + " ms gap.");
-
-            for (var j = 0; j < missing; j++) {
-              var newStamp = Math.max(nextPts, 0);
-              fillFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
-
-              if (!fillFrame) {
-                logger["logger"].log('Unable to get silent frame for given audio codec; duplicating last frame instead.');
-                fillFrame = sample.unit.subarray();
-              }
-
-              inputSamples.splice(i, 0, {
-                unit: fillFrame,
-                pts: newStamp,
-                dts: newStamp
-              });
-              nextPts += inputSampleDuration;
-              i++;
-            } // Adjust sample to next expected pts
-
-
-            sample.pts = sample.dts = nextPts;
-            nextPts += inputSampleDuration;
-            i++;
-          } else {
-            // Otherwise, just adjust pts
-            if (Math.abs(delta) > 0.1 * inputSampleDuration) {// logger.log(`Invalid frame delta ${Math.round(delta + inputSampleDuration)} at PTS ${Math.round(pts / 90)} (should be ${Math.round(inputSampleDuration)}).`);
-            }
-
-            sample.pts = sample.dts = nextPts;
-            nextPts += inputSampleDuration;
-            i++;
-          }
-      }
-    } // compute mdat size, as we eventually filtered/added some samples
-
-
-    var nbSamples = inputSamples.length;
-    var mdatSize = 0;
-
-    while (nbSamples--) {
-      mdatSize += inputSamples[nbSamples].unit.byteLength;
-    }
-
-    for (var _j2 = 0, _nbSamples = inputSamples.length; _j2 < _nbSamples; _j2++) {
-      var audioSample = inputSamples[_j2];
-      var unit = audioSample.unit;
-      var _pts = audioSample.pts; // logger.log(`Audio/PTS:${toMsFromMpegTsClock(pts, true)}`);
-      // if not first sample
-
-      if (lastPTS !== undefined) {
-        mp4Sample.duration = Math.round((_pts - lastPTS) / scaleFactor);
-      } else {
-        var _delta = _pts - nextAudioPts;
-
-        var numMissingFrames = 0; // if fragment are contiguous, detect hole/overlapping between fragments
-        // contiguous fragments are consecutive fragments from same quality level (same level, new SN = old SN + 1)
-
-        if (contiguous && track.isAAC) {
-          // log delta
-          if (_delta) {
-            if (_delta > 0 && _delta < MAX_SILENT_FRAME_DURATION_90KHZ) {
-              // Q: why do we have to round here, shouldn't this always result in an integer if timestamps are correct,
-              // and if not, shouldn't we actually Math.ceil() instead?
-              numMissingFrames = Math.round((_pts - nextAudioPts) / inputSampleDuration);
-              logger["logger"].log(toMsFromMpegTsClock(_delta, true) + " ms hole between AAC samples detected,filling it");
-
-              if (numMissingFrames > 0) {
-                fillFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
-
-                if (!fillFrame) {
-                  fillFrame = unit.subarray();
-                }
-
-                mdatSize += numMissingFrames * fillFrame.length;
-              } // if we have frame overlap, overlapping for more than half a frame duraion
-
-            } else if (_delta < -12) {
-              // drop overlapping audio frames... browser will deal with it
-              logger["logger"].log("drop overlapping AAC sample, expected/parsed/delta: " + toMsFromMpegTsClock(nextAudioPts, true) + " ms / " + toMsFromMpegTsClock(_pts, true) + " ms / " + toMsFromMpegTsClock(-_delta, true) + " ms");
-              mdatSize -= unit.byteLength;
-              continue;
-            } // set PTS/DTS to expected PTS/DTS
-
-
-            _pts = nextAudioPts;
-          }
-        } // remember first PTS of our audioSamples
-
-
-        firstPTS = _pts;
-
-        if (mdatSize > 0) {
-          mdatSize += offset;
-
-          try {
-            mdat = new Uint8Array(mdatSize);
-          } catch (err) {
-            this.observer.trigger(events["default"].ERROR, {
-              type: errors["ErrorTypes"].MUX_ERROR,
-              details: errors["ErrorDetails"].REMUX_ALLOC_ERROR,
-              fatal: false,
-              bytes: mdatSize,
-              reason: "fail allocating audio mdat " + mdatSize
-            });
-            return;
-          }
-
-          if (!rawMPEG) {
-            var view = new DataView(mdat.buffer);
-            view.setUint32(0, mdatSize);
-            mdat.set(mp4_generator.types.mdat, 4);
-          }
-        } else {
-          // no audio samples
-          return;
-        }
-
-        for (var _i3 = 0; _i3 < numMissingFrames; _i3++) {
-          fillFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
-
-          if (!fillFrame) {
-            logger["logger"].log('Unable to get silent frame for given audio codec; duplicating this frame instead.');
-            fillFrame = unit.subarray();
-          }
-
-          mdat.set(fillFrame, offset);
-          offset += fillFrame.byteLength;
-          mp4Sample = {
-            size: fillFrame.byteLength,
-            cts: 0,
-            duration: 1024,
-            flags: {
-              isLeading: 0,
-              isDependedOn: 0,
-              hasRedundancy: 0,
-              degradPrio: 0,
-              dependsOn: 1
-            }
-          };
-          outputSamples.push(mp4Sample);
-        }
-      }
-
-      mdat.set(unit, offset);
-      var unitLen = unit.byteLength;
-      offset += unitLen; // console.log('PTS/DTS/initDTS/normPTS/normDTS/relative PTS : ${audioSample.pts}/${audioSample.dts}/${initDTS}/${ptsnorm}/${dtsnorm}/${(audioSample.pts/4294967296).toFixed(3)}');
-
-      mp4Sample = {
-        size: unitLen,
-        cts: 0,
-        duration: 0,
-        flags: {
-          isLeading: 0,
-          isDependedOn: 0,
-          hasRedundancy: 0,
-          degradPrio: 0,
-          dependsOn: 1
-        }
-      };
-      outputSamples.push(mp4Sample);
-      lastPTS = _pts;
-    }
-
-    var lastSampleDuration = 0;
-    nbSamples = outputSamples.length; // set last sample duration as being identical to previous sample
-
-    if (nbSamples >= 2) {
-      lastSampleDuration = outputSamples[nbSamples - 2].duration;
-      mp4Sample.duration = lastSampleDuration;
-    }
-
-    if (nbSamples) {
-      // next audio sample PTS should be equal to last sample PTS + duration
-      this.nextAudioPts = nextAudioPts = lastPTS + scaleFactor * lastSampleDuration; // logger.log('Audio/PTS/PTSend:' + audioSample.pts.toFixed(0) + '/' + this.nextAacDts.toFixed(0));
-
-      track.samples = outputSamples;
-
-      if (rawMPEG) {
-        moof = new Uint8Array();
-      } else {
-        moof = mp4_generator.moof(track.sequenceNumber++, firstPTS / scaleFactor, track);
-      }
-
-      track.samples = [];
-      var start = firstPTS / inputTimeScale;
-      var end = nextAudioPts / inputTimeScale;
-      var audioData = {
-        data1: moof,
-        data2: mdat,
-        startPTS: start,
-        endPTS: end,
-        startDTS: start,
-        endDTS: end,
-        type: 'audio',
-        hasAudio: true,
-        hasVideo: false,
-        nb: nbSamples
-      };
-      this.observer.trigger(events["default"].FRAG_PARSING_DATA, audioData);
-      return audioData;
-    }
-
-    return null;
-  };
-
-  _proto.remuxEmptyAudio = function remuxEmptyAudio(track, timeOffset, contiguous, videoData) {
-    var inputTimeScale = track.inputTimeScale;
-    var mp4timeScale = track.samplerate ? track.samplerate : inputTimeScale;
-    var scaleFactor = inputTimeScale / mp4timeScale;
-    var nextAudioPts = this.nextAudioPts; // sync with video's timestamp
-
-    var startDTS = (nextAudioPts !== undefined ? nextAudioPts : videoData.startDTS * inputTimeScale) + this._initDTS;
-    var endDTS = videoData.endDTS * inputTimeScale + this._initDTS; // one sample's duration value
-
-    var sampleDuration = 1024;
-    var frameDuration = scaleFactor * sampleDuration; // samples count of this segment's duration
-
-    var nbSamples = Math.ceil((endDTS - startDTS) / frameDuration); // silent frame
-
-    var silentFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
-    logger["logger"].warn('remux empty Audio'); // Can't remux if we can't generate a silent frame...
-
-    if (!silentFrame) {
-      logger["logger"].trace('Unable to remuxEmptyAudio since we were unable to get a silent frame for given audio codec!');
-      return;
-    }
-
-    var samples = [];
-
-    for (var i = 0; i < nbSamples; i++) {
-      var stamp = startDTS + i * frameDuration;
-      samples.push({
-        unit: silentFrame,
-        pts: stamp,
-        dts: stamp
-      });
-    }
-
-    track.samples = samples;
-    this.remuxAudio(track, timeOffset, contiguous);
-  };
-
-  _proto.remuxID3 = function remuxID3(track) {
-    var length = track.samples.length,
-        sample;
-    var inputTimeScale = track.inputTimeScale;
-    var initPTS = this._initPTS;
-    var initDTS = this._initDTS; // consume samples
-
-    if (length) {
-      for (var index = 0; index < length; index++) {
-        sample = track.samples[index]; // setting id3 pts, dts to relative time
-        // using this._initPTS and this._initDTS to calculate relative time
-
-        sample.pts = (sample.pts - initPTS) / inputTimeScale;
-        sample.dts = (sample.dts - initDTS) / inputTimeScale;
-      }
-
-      this.observer.trigger(events["default"].FRAG_PARSING_METADATA, {
-        samples: track.samples
-      });
-    }
-
-    track.samples = [];
-  };
-
-  _proto.remuxText = function remuxText(track) {
-    track.samples.sort(function (a, b) {
-      return a.pts - b.pts;
-    });
-    var length = track.samples.length,
-        sample;
-    var inputTimeScale = track.inputTimeScale;
-    var initPTS = this._initPTS; // consume samples
-
-    if (length) {
-      for (var index = 0; index < length; index++) {
-        sample = track.samples[index]; // setting text pts, dts to relative time
-        // using this._initPTS and this._initDTS to calculate relative time
-
-        sample.pts = (sample.pts - initPTS) / inputTimeScale;
-      }
-
-      this.observer.trigger(events["default"].FRAG_PARSING_USERDATA, {
-        samples: track.samples
-      });
-    }
-
-    track.samples = [];
-  };
-
-  _proto._PTSNormalize = function _PTSNormalize(value, reference) {
-    var offset;
-
-    if (reference === undefined) {
-      return value;
-    }
-
-    if (reference < value) {
-      // - 2^33
-      offset = -8589934592;
-    } else {
-      // + 2^33
-      offset = 8589934592;
-    }
-    /* PTS is 33bit (from 0 to 2^33 -1)
-      if diff between value and reference is bigger than half of the amplitude (2^32) then it means that
-      PTS looping occured. fill the gap */
-
-
-    while (Math.abs(value - reference) > 4294967296) {
-      value += offset;
-    }
-
-    return value;
-  };
-
-  return MP4Remuxer;
-}();
-
-/* harmony default export */ var mp4_remuxer = (mp4_remuxer_MP4Remuxer);
 // CONCATENATED MODULE: ./src/remux/passthrough-remuxer.js
 /**
  * passthrough remuxer
@@ -5326,16 +3880,16 @@ function () {
 
       var muxConfig = [{
         demux: tsdemuxer,
-        remux: mp4_remuxer
+        remux: mp4_remuxer["default"]
       }, {
         demux: mp4demuxer["default"],
         remux: passthrough_remuxer
       }, {
         demux: aacdemuxer,
-        remux: mp4_remuxer
+        remux: mp4_remuxer["default"]
       }, {
         demux: mp3demuxer,
-        remux: mp4_remuxer
+        remux: mp4_remuxer["default"]
       }]; // probe for content type
 
       for (var i = 0, len = muxConfig.length; i < len; i++) {
@@ -6592,8 +5146,10 @@ var HlsEvents = (_HlsEvents = {
 /*! ModuleConcatenation bailout: Cannot concat with ./src/errors.ts because of ./src/demux/demuxer-worker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/events.js because of ./src/demux/demuxer-worker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/polyfills/number-isFinite.js because of ./src/demux/demuxer-worker.js */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/remux/mp4-remuxer.js because of ./src/demux/demuxer-worker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/utils/get-self-scope.js because of ./src/demux/demuxer-worker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/utils/logger.js because of ./src/demux/demuxer-worker.js */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/utils/timescale-conversion.ts because of ./src/demux/demuxer-worker.js */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/eventemitter3/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/url-toolkit/src/url-toolkit.js (<- Module is not an ECMAScript module) */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -9084,7 +7640,7 @@ var eventemitter3 = __webpack_require__("./node_modules/eventemitter3/index.js")
 // EXTERNAL MODULE: ./node_modules/webworkify-webpack/index.js
 var webworkify_webpack = __webpack_require__("./node_modules/webworkify-webpack/index.js");
 
-// EXTERNAL MODULE: ./src/demux/demuxer-inline.js + 12 modules
+// EXTERNAL MODULE: ./src/demux/demuxer-inline.js + 8 modules
 var demuxer_inline = __webpack_require__("./src/demux/demuxer-inline.js");
 
 // CONCATENATED MODULE: ./src/utils/mediasource-helper.ts
@@ -18330,16 +16886,29 @@ function () {
 }();
 
 
-// CONCATENATED MODULE: ./src/utils/webvtt-parser.js
+// EXTERNAL MODULE: ./src/utils/timescale-conversion.ts
+var timescale_conversion = __webpack_require__("./src/utils/timescale-conversion.ts");
+
+// EXTERNAL MODULE: ./src/remux/mp4-remuxer.js + 2 modules
+var mp4_remuxer = __webpack_require__("./src/remux/mp4-remuxer.js");
+
+// CONCATENATED MODULE: ./src/utils/webvtt-parser.ts
 
 
 
 
 
- // String.prototype.startsWith is not supported in IE11
+
+
+
+var LINEBREAKS = /\r\n|\n\r|\n|\r/g; // String.prototype.startsWith is not supported in IE11
 
 var startsWith = function startsWith(inputString, searchString, position) {
-  return inputString.substr(position || 0, searchString.length) === searchString;
+  if (position === void 0) {
+    position = 0;
+  }
+
+  return inputString.substr(position, searchString.length) === searchString;
 };
 
 var webvtt_parser_cueString2millis = function cueString2millis(timeString) {
@@ -18368,7 +16937,13 @@ var hash = function hash(text) {
   }
 
   return (hash >>> 0).toString();
-};
+}; // Create a unique hash id for a cue based on start/end times and text.
+// This helps timeline-controller to avoid showing repeated captions.
+
+
+function generateCueId(startTime, endTime, text) {
+  return hash(startTime.toString()) + hash(endTime.toString()) + hash(text);
+}
 
 var calculateOffset = function calculateOffset(vttCCs, cc, presentationTime) {
   var currCC = vttCCs[cc];
@@ -18393,123 +16968,112 @@ var calculateOffset = function calculateOffset(vttCCs, cc, presentationTime) {
   vttCCs.presentationOffset = presentationTime;
 };
 
-var WebVTTParser = {
-  parse: function parse(vttByteArray, syncPTS, vttCCs, cc, callBack, errorCallBack) {
-    // Convert byteArray into string, replacing any somewhat exotic linefeeds with "\n", then split on that character.
-    var re = /\r\n|\n\r|\n|\r/g; // Uint8Array.prototype.reduce is not implemented in IE11
+function parseWebVTT(vttByteArray, initPTS, timescale, vttCCs, cc, timeOffset, callBack, errorCallBack) {
+  var parser = new vttparser(); // Convert byteArray into string, replacing any somewhat exotic linefeeds with "\n", then split on that character.
+  // Uint8Array.prototype.reduce is not implemented in IE11
 
-    var vttLines = Object(id3["utf8ArrayToStr"])(new Uint8Array(vttByteArray)).trim().replace(re, '\n').split('\n');
-    var cueTime = '00:00.000';
-    var mpegTs = 0;
-    var localTime = 0;
-    var presentationTime = 0;
-    var cues = [];
-    var parsingError;
-    var inHeader = true;
-    var timestampMap = false; // let VTTCue = VTTCue || window.TextTrackCue;
-    // Create parser object using VTTCue with TextTrackCue fallback on certain browsers.
+  var vttLines = Object(id3["utf8ArrayToStr"])(new Uint8Array(vttByteArray)).trim().replace(LINEBREAKS, '\n').split('\n');
+  var cues = [];
+  var initPTS90Hz = Object(timescale_conversion["toMpegTsClockFromTimescale"])(initPTS, timescale);
+  var cueTime = '00:00.000';
+  var timestampMapMPEGTS = 0;
+  var timestampMapLOCAL = 0;
+  var parsingError;
+  var inHeader = true;
+  var timestampMap = false;
 
-    var parser = new vttparser();
+  parser.oncue = function (cue) {
+    // Adjust cue timing; clamp cues to start no earlier than - and drop cues that don't end after - 0 on timeline.
+    var currCC = vttCCs[cc];
+    var cueOffset = vttCCs.ccOffset; // Calculate subtitle PTS offset
 
-    parser.oncue = function (cue) {
-      // Adjust cue timing; clamp cues to start no earlier than - and drop cues that don't end after - 0 on timeline.
-      var currCC = vttCCs[cc];
-      var cueOffset = vttCCs.ccOffset; // Update offsets for new discontinuities
+    var webVttMpegTsMapOffset = (timestampMapMPEGTS - initPTS90Hz) / 90000; // Update offsets for new discontinuities
 
-      if (currCC && currCC.new) {
-        if (localTime !== undefined) {
-          // When local time is provided, offset = discontinuity start time - local time
-          cueOffset = vttCCs.ccOffset = currCC.start;
-        } else {
-          calculateOffset(vttCCs, cc, presentationTime);
-        }
+    if (currCC && currCC.new) {
+      if (timestampMapLOCAL !== undefined) {
+        // When local time is provided, offset = discontinuity start time - local time
+        cueOffset = vttCCs.ccOffset = currCC.start;
+      } else {
+        calculateOffset(vttCCs, cc, webVttMpegTsMapOffset);
       }
+    }
 
-      if (presentationTime) {
-        // If we have MPEGTS, offset = presentation time + discontinuity offset        
-        cueOffset = presentationTime - vttCCs.presentationOffset;
-      } // console.log(cue.startTime + ' before');
+    if (webVttMpegTsMapOffset) {
+      // If we have MPEGTS, offset = presentation time + discontinuity offset
+      cueOffset = webVttMpegTsMapOffset - vttCCs.presentationOffset;
+    }
+
+    if (timestampMap) {
+      var duration = cue.endTime - cue.startTime;
+      var startTime = Object(mp4_remuxer["normalizePts"])((cue.startTime + cueOffset - timestampMapLOCAL) * 90000, timeOffset * 90000) / 90000;
+      cue.startTime = startTime;
+      cue.endTime = startTime + duration;
+    } //trim trailing webvtt block whitespaces
 
 
-      cue.startTime += cueOffset - localTime;
-      cue.endTime += cueOffset - localTime;
-      var text = cue.text.trim(); // Create a unique hash id for a cue based on start/end times and text.
-      // This helps timeline-controller to avoid showing repeated captions.
+    var text = cue.text.trim(); // Fix encoding of special characters
 
-      cue.id = hash(cue.startTime.toString()) + hash(cue.endTime.toString()) + hash(text); // Fix encoding of special characters. TODO: Test with all sorts of weird characters.
+    cue.text = decodeURIComponent(encodeURIComponent(text)); // If the cue was not assigned an id from the VTT file (line above the content), create one.
 
-      cue.text = decodeURIComponent(encodeURIComponent(cue.text));
+    if (!cue.id) {
+      cue.id = generateCueId(cue.startTime, cue.endTime, text);
+    }
 
-      if (cue.endTime > 0) {
-        cues.push(cue);
-      }
-    };
+    if (cue.endTime > 0) {
+      cues.push(cue);
+    }
+  };
 
-    parser.onparsingerror = function (e) {
-      parsingError = e;
-    };
+  parser.onparsingerror = function (error) {
+    parsingError = error;
+  };
 
-    parser.onflush = function () {
-      if (parsingError && errorCallBack) {
-        errorCallBack(parsingError);
+  parser.onflush = function () {
+    if (parsingError) {
+      errorCallBack(parsingError);
+      return;
+    }
+
+    callBack(cues);
+  }; // Go through contents line by line.
+
+
+  vttLines.forEach(function (line) {
+    if (inHeader) {
+      // Look for X-TIMESTAMP-MAP in header.
+      if (startsWith(line, 'X-TIMESTAMP-MAP=')) {
+        // Once found, no more are allowed anyway, so stop searching.
+        inHeader = false;
+        timestampMap = true; // Extract LOCAL and MPEGTS.
+
+        line.substr(16).split(',').forEach(function (timestamp) {
+          if (startsWith(timestamp, 'LOCAL:')) {
+            cueTime = timestamp.substr(6);
+          } else if (startsWith(timestamp, 'MPEGTS:')) {
+            timestampMapMPEGTS = parseInt(timestamp.substr(7));
+          }
+        });
+
+        try {
+          // Convert cue time to seconds
+          timestampMapLOCAL = webvtt_parser_cueString2millis(cueTime) / 1000;
+        } catch (error) {
+          timestampMap = false;
+          parsingError = error;
+        } // Return without parsing X-TIMESTAMP-MAP line.
+
+
         return;
+      } else if (line === '') {
+        inHeader = false;
       }
-
-      callBack(cues);
-    }; // Go through contents line by line.
+    } // Parse line by default.
 
 
-    vttLines.forEach(function (line) {
-      if (inHeader) {
-        // Look for X-TIMESTAMP-MAP in header.
-        if (startsWith(line, 'X-TIMESTAMP-MAP=')) {
-          // Once found, no more are allowed anyway, so stop searching.
-          inHeader = false;
-          timestampMap = true; // Extract LOCAL and MPEGTS.
-
-          line.substr(16).split(',').forEach(function (timestamp) {
-            if (startsWith(timestamp, 'LOCAL:')) {
-              cueTime = timestamp.substr(6);
-            } else if (startsWith(timestamp, 'MPEGTS:')) {
-              mpegTs = parseInt(timestamp.substr(7));
-            }
-          });
-
-          try {
-            //
-            // Calculate subtitle offset in milliseconds.
-            // if (syncPTS + ((vttCCs[cc].start * 90000) || 0) < 0) {
-            //   syncPTS += 8589934592;
-            // }
-            // Adjust MPEGTS by sync PTS.
-            mpegTs -= syncPTS; // Convert cue time to seconds
-
-            localTime = webvtt_parser_cueString2millis(cueTime) / 1000; // Convert MPEGTS to seconds from 90kHz.
-
-            presentationTime = mpegTs / 90000; //console.log(syncPTS + " syncPTS is " + presentationTime + ' local time ' + localTime);
-
-            if (localTime === -1) {
-              parsingError = new Error("Malformed X-TIMESTAMP-MAP: " + line);
-            }
-          } catch (e) {
-            timestampMap = false;
-            parsingError = e;
-          } // Return without parsing X-TIMESTAMP-MAP line.
-
-
-          return;
-        } else if (line === '') {
-          inHeader = false;
-        }
-      } // Parse line by default.
-
-
-      parser.parse(line + '\n');
-    });
-    parser.flush();
-  }
-};
-/* harmony default export */ var webvtt_parser = (WebVTTParser);
+    parser.parse(line + '\n');
+  });
+  parser.flush();
+}
 // CONCATENATED MODULE: ./src/controller/timeline-controller.ts
 
 
@@ -18543,6 +17107,7 @@ function (_EventHandler) {
     _this.textTracks = [];
     _this.tracks = [];
     _this.initPTS = [];
+    _this.timescale = [];
     _this.unparsedVttFrags = [];
     _this.cueRanges = [];
     _this.captionsTracks = {};
@@ -18609,11 +17174,13 @@ function (_EventHandler) {
 
     var frag = data.frag,
         id = data.id,
-        initPTS = data.initPTS;
+        initPTS = data.initPTS,
+        timescale = data.timescale;
     var unparsedVttFrags = this.unparsedVttFrags;
 
     if (id === 'main') {
       this.initPTS[frag.cc] = initPTS;
+      this.timescale[frag.cc] = timescale;
     } // Due to asynchronous processing, initial PTS may arrive later than the first VTT fragments are loaded.
     // Parse any unparsed fragments upon receiving the initial PTS.
 
@@ -18712,6 +17279,7 @@ function (_EventHandler) {
         new: false
       }
     };
+    this.timescale = [];
 
     this._cleanTracks();
   };
@@ -18846,7 +17414,7 @@ function (_EventHandler) {
     } // Parse the WebVTT file contents.
 
 
-    webvtt_parser.parse(payload, this.initPTS[frag.cc], vttCCs, frag.cc, function (cues) {
+    parseWebVTT(payload, this.initPTS[frag.cc], this.timescale[frag.cc], vttCCs, frag.cc, frag.start, function (cues) {
       var currentTrack = textTracks[frag.level]; // WebVTTParser.parse is an async method and if the currently selected text track mode is set to "disabled"
       // before parsing is done then don't try to access currentTrack.cues.getCueById as cues will be null
       // and trying to access getCueById method of cues will throw an exception
@@ -18898,9 +17466,9 @@ function (_EventHandler) {
         success: true,
         frag: frag
       });
-    }, function (e) {
+    }, function (error) {
       // Something went wrong while parsing. Trigger event with success false.
-      logger["logger"].log("Failed to parse VTT cue: " + e);
+      logger["logger"].log("Failed to parse VTT cue: " + error);
       hls.trigger(events["default"].SUBTITLE_FRAG_PROCESSED, {
         success: false,
         frag: frag
@@ -21154,6 +19722,1475 @@ var isFiniteNumber = Number.isFinite || function (value) {
 
 /***/ }),
 
+/***/ "./src/remux/mp4-remuxer.js":
+/*!**********************************************!*\
+  !*** ./src/remux/mp4-remuxer.js + 2 modules ***!
+  \**********************************************/
+/*! exports provided: normalizePts, default */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/errors.ts because of ./src/hls.ts */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/events.js because of ./src/hls.ts */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/utils/logger.js because of ./src/hls.ts */
+/*! ModuleConcatenation bailout: Cannot concat with ./src/utils/timescale-conversion.ts because of ./src/hls.ts */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// CONCATENATED MODULE: ./src/remux/aac-helper.js
+/**
+ *  AAC helper
+ */
+var AAC =
+/*#__PURE__*/
+function () {
+  function AAC() {}
+
+  AAC.getSilentFrame = function getSilentFrame(codec, channelCount) {
+    switch (codec) {
+      case 'mp4a.40.2':
+        if (channelCount === 1) {
+          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x23, 0x80]);
+        } else if (channelCount === 2) {
+          return new Uint8Array([0x21, 0x00, 0x49, 0x90, 0x02, 0x19, 0x00, 0x23, 0x80]);
+        } else if (channelCount === 3) {
+          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x8e]);
+        } else if (channelCount === 4) {
+          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x80, 0x2c, 0x80, 0x08, 0x02, 0x38]);
+        } else if (channelCount === 5) {
+          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x82, 0x30, 0x04, 0x99, 0x00, 0x21, 0x90, 0x02, 0x38]);
+        } else if (channelCount === 6) {
+          return new Uint8Array([0x00, 0xc8, 0x00, 0x80, 0x20, 0x84, 0x01, 0x26, 0x40, 0x08, 0x64, 0x00, 0x82, 0x30, 0x04, 0x99, 0x00, 0x21, 0x90, 0x02, 0x00, 0xb2, 0x00, 0x20, 0x08, 0xe0]);
+        }
+
+        break;
+      // handle HE-AAC below (mp4a.40.5 / mp4a.40.29)
+
+      default:
+        if (channelCount === 1) {
+          // ffmpeg -y -f lavfi -i "aevalsrc=0:d=0.05" -c:a libfdk_aac -profile:a aac_he -b:a 4k output.aac && hexdump -v -e '16/1 "0x%x," "\n"' -v output.aac
+          return new Uint8Array([0x1, 0x40, 0x22, 0x80, 0xa3, 0x4e, 0xe6, 0x80, 0xba, 0x8, 0x0, 0x0, 0x0, 0x1c, 0x6, 0xf1, 0xc1, 0xa, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5e]);
+        } else if (channelCount === 2) {
+          // ffmpeg -y -f lavfi -i "aevalsrc=0|0:d=0.05" -c:a libfdk_aac -profile:a aac_he_v2 -b:a 4k output.aac && hexdump -v -e '16/1 "0x%x," "\n"' -v output.aac
+          return new Uint8Array([0x1, 0x40, 0x22, 0x80, 0xa3, 0x5e, 0xe6, 0x80, 0xba, 0x8, 0x0, 0x0, 0x0, 0x0, 0x95, 0x0, 0x6, 0xf1, 0xa1, 0xa, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5e]);
+        } else if (channelCount === 3) {
+          // ffmpeg -y -f lavfi -i "aevalsrc=0|0|0:d=0.05" -c:a libfdk_aac -profile:a aac_he_v2 -b:a 4k output.aac && hexdump -v -e '16/1 "0x%x," "\n"' -v output.aac
+          return new Uint8Array([0x1, 0x40, 0x22, 0x80, 0xa3, 0x5e, 0xe6, 0x80, 0xba, 0x8, 0x0, 0x0, 0x0, 0x0, 0x95, 0x0, 0x6, 0xf1, 0xa1, 0xa, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a, 0x5e]);
+        }
+
+        break;
+    }
+
+    return null;
+  };
+
+  return AAC;
+}();
+
+/* harmony default export */ var aac_helper = (AAC);
+// CONCATENATED MODULE: ./src/remux/mp4-generator.js
+/**
+ * Generate MP4 Box
+*/
+var UINT32_MAX = Math.pow(2, 32) - 1;
+
+var MP4 =
+/*#__PURE__*/
+function () {
+  function MP4() {}
+
+  MP4.init = function init() {
+    MP4.types = {
+      avc1: [],
+      // codingname
+      avcC: [],
+      btrt: [],
+      dinf: [],
+      dref: [],
+      esds: [],
+      ftyp: [],
+      hdlr: [],
+      mdat: [],
+      mdhd: [],
+      mdia: [],
+      mfhd: [],
+      minf: [],
+      moof: [],
+      moov: [],
+      mp4a: [],
+      '.mp3': [],
+      mvex: [],
+      mvhd: [],
+      pasp: [],
+      sdtp: [],
+      stbl: [],
+      stco: [],
+      stsc: [],
+      stsd: [],
+      stsz: [],
+      stts: [],
+      tfdt: [],
+      tfhd: [],
+      traf: [],
+      trak: [],
+      trun: [],
+      trex: [],
+      tkhd: [],
+      vmhd: [],
+      smhd: []
+    };
+    var i;
+
+    for (i in MP4.types) {
+      if (MP4.types.hasOwnProperty(i)) {
+        MP4.types[i] = [i.charCodeAt(0), i.charCodeAt(1), i.charCodeAt(2), i.charCodeAt(3)];
+      }
+    }
+
+    var videoHdlr = new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x00, // pre_defined
+    0x76, 0x69, 0x64, 0x65, // handler_type: 'vide'
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x56, 0x69, 0x64, 0x65, 0x6f, 0x48, 0x61, 0x6e, 0x64, 0x6c, 0x65, 0x72, 0x00 // name: 'VideoHandler'
+    ]);
+    var audioHdlr = new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x00, // pre_defined
+    0x73, 0x6f, 0x75, 0x6e, // handler_type: 'soun'
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x53, 0x6f, 0x75, 0x6e, 0x64, 0x48, 0x61, 0x6e, 0x64, 0x6c, 0x65, 0x72, 0x00 // name: 'SoundHandler'
+    ]);
+    MP4.HDLR_TYPES = {
+      'video': videoHdlr,
+      'audio': audioHdlr
+    };
+    var dref = new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x01, // entry_count
+    0x00, 0x00, 0x00, 0x0c, // entry_size
+    0x75, 0x72, 0x6c, 0x20, // 'url' type
+    0x00, // version 0
+    0x00, 0x00, 0x01 // entry_flags
+    ]);
+    var stco = new Uint8Array([0x00, // version
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x00 // entry_count
+    ]);
+    MP4.STTS = MP4.STSC = MP4.STCO = stco;
+    MP4.STSZ = new Uint8Array([0x00, // version
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x00, // sample_size
+    0x00, 0x00, 0x00, 0x00 // sample_count
+    ]);
+    MP4.VMHD = new Uint8Array([0x00, // version
+    0x00, 0x00, 0x01, // flags
+    0x00, 0x00, // graphicsmode
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // opcolor
+    ]);
+    MP4.SMHD = new Uint8Array([0x00, // version
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, // balance
+    0x00, 0x00 // reserved
+    ]);
+    MP4.STSD = new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x01]); // entry_count
+
+    var majorBrand = new Uint8Array([105, 115, 111, 109]); // isom
+
+    var avc1Brand = new Uint8Array([97, 118, 99, 49]); // avc1
+
+    var minorVersion = new Uint8Array([0, 0, 0, 1]);
+    MP4.FTYP = MP4.box(MP4.types.ftyp, majorBrand, minorVersion, majorBrand, avc1Brand);
+    MP4.DINF = MP4.box(MP4.types.dinf, MP4.box(MP4.types.dref, dref));
+  };
+
+  MP4.box = function box(type) {
+    var payload = Array.prototype.slice.call(arguments, 1),
+        size = 8,
+        i = payload.length,
+        len = i,
+        result; // calculate the total size we need to allocate
+
+    while (i--) {
+      size += payload[i].byteLength;
+    }
+
+    result = new Uint8Array(size);
+    result[0] = size >> 24 & 0xff;
+    result[1] = size >> 16 & 0xff;
+    result[2] = size >> 8 & 0xff;
+    result[3] = size & 0xff;
+    result.set(type, 4); // copy the payload into the result
+
+    for (i = 0, size = 8; i < len; i++) {
+      // copy payload[i] array @ offset size
+      result.set(payload[i], size);
+      size += payload[i].byteLength;
+    }
+
+    return result;
+  };
+
+  MP4.hdlr = function hdlr(type) {
+    return MP4.box(MP4.types.hdlr, MP4.HDLR_TYPES[type]);
+  };
+
+  MP4.mdat = function mdat(data) {
+    return MP4.box(MP4.types.mdat, data);
+  };
+
+  MP4.mdhd = function mdhd(timescale, duration) {
+    duration *= timescale;
+    var upperWordDuration = Math.floor(duration / (UINT32_MAX + 1));
+    var lowerWordDuration = Math.floor(duration % (UINT32_MAX + 1));
+    return MP4.box(MP4.types.mdhd, new Uint8Array([0x01, // version 1
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // creation_time
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, // modification_time
+    timescale >> 24 & 0xFF, timescale >> 16 & 0xFF, timescale >> 8 & 0xFF, timescale & 0xFF, // timescale
+    upperWordDuration >> 24, upperWordDuration >> 16 & 0xFF, upperWordDuration >> 8 & 0xFF, upperWordDuration & 0xFF, lowerWordDuration >> 24, lowerWordDuration >> 16 & 0xFF, lowerWordDuration >> 8 & 0xFF, lowerWordDuration & 0xFF, 0x55, 0xc4, // 'und' language (undetermined)
+    0x00, 0x00]));
+  };
+
+  MP4.mdia = function mdia(track) {
+    return MP4.box(MP4.types.mdia, MP4.mdhd(track.timescale, track.duration), MP4.hdlr(track.type), MP4.minf(track));
+  };
+
+  MP4.mfhd = function mfhd(sequenceNumber) {
+    return MP4.box(MP4.types.mfhd, new Uint8Array([0x00, 0x00, 0x00, 0x00, // flags
+    sequenceNumber >> 24, sequenceNumber >> 16 & 0xFF, sequenceNumber >> 8 & 0xFF, sequenceNumber & 0xFF // sequence_number
+    ]));
+  };
+
+  MP4.minf = function minf(track) {
+    if (track.type === 'audio') {
+      return MP4.box(MP4.types.minf, MP4.box(MP4.types.smhd, MP4.SMHD), MP4.DINF, MP4.stbl(track));
+    } else {
+      return MP4.box(MP4.types.minf, MP4.box(MP4.types.vmhd, MP4.VMHD), MP4.DINF, MP4.stbl(track));
+    }
+  };
+
+  MP4.moof = function moof(sn, baseMediaDecodeTime, track) {
+    return MP4.box(MP4.types.moof, MP4.mfhd(sn), MP4.traf(track, baseMediaDecodeTime));
+  }
+  /**
+  * @param tracks... (optional) {array} the tracks associated with this movie
+  */
+  ;
+
+  MP4.moov = function moov(tracks) {
+    var i = tracks.length,
+        boxes = [];
+
+    while (i--) {
+      boxes[i] = MP4.trak(tracks[i]);
+    }
+
+    return MP4.box.apply(null, [MP4.types.moov, MP4.mvhd(tracks[0].timescale, tracks[0].duration)].concat(boxes).concat(MP4.mvex(tracks)));
+  };
+
+  MP4.mvex = function mvex(tracks) {
+    var i = tracks.length,
+        boxes = [];
+
+    while (i--) {
+      boxes[i] = MP4.trex(tracks[i]);
+    }
+
+    return MP4.box.apply(null, [MP4.types.mvex].concat(boxes));
+  };
+
+  MP4.mvhd = function mvhd(timescale, duration) {
+    duration *= timescale;
+    var upperWordDuration = Math.floor(duration / (UINT32_MAX + 1));
+    var lowerWordDuration = Math.floor(duration % (UINT32_MAX + 1));
+    var bytes = new Uint8Array([0x01, // version 1
+    0x00, 0x00, 0x00, // flags
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // creation_time
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, // modification_time
+    timescale >> 24 & 0xFF, timescale >> 16 & 0xFF, timescale >> 8 & 0xFF, timescale & 0xFF, // timescale
+    upperWordDuration >> 24, upperWordDuration >> 16 & 0xFF, upperWordDuration >> 8 & 0xFF, upperWordDuration & 0xFF, lowerWordDuration >> 24, lowerWordDuration >> 16 & 0xFF, lowerWordDuration >> 8 & 0xFF, lowerWordDuration & 0xFF, 0x00, 0x01, 0x00, 0x00, // 1.0 rate
+    0x01, 0x00, // 1.0 volume
+    0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, // transformation: unity matrix
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // pre_defined
+    0xff, 0xff, 0xff, 0xff // next_track_ID
+    ]);
+    return MP4.box(MP4.types.mvhd, bytes);
+  };
+
+  MP4.sdtp = function sdtp(track) {
+    var samples = track.samples || [],
+        bytes = new Uint8Array(4 + samples.length),
+        flags,
+        i; // leave the full box header (4 bytes) all zero
+    // write the sample table
+
+    for (i = 0; i < samples.length; i++) {
+      flags = samples[i].flags;
+      bytes[i + 4] = flags.dependsOn << 4 | flags.isDependedOn << 2 | flags.hasRedundancy;
+    }
+
+    return MP4.box(MP4.types.sdtp, bytes);
+  };
+
+  MP4.stbl = function stbl(track) {
+    return MP4.box(MP4.types.stbl, MP4.stsd(track), MP4.box(MP4.types.stts, MP4.STTS), MP4.box(MP4.types.stsc, MP4.STSC), MP4.box(MP4.types.stsz, MP4.STSZ), MP4.box(MP4.types.stco, MP4.STCO));
+  };
+
+  MP4.avc1 = function avc1(track) {
+    var sps = [],
+        pps = [],
+        i,
+        data,
+        len; // assemble the SPSs
+
+    for (i = 0; i < track.sps.length; i++) {
+      data = track.sps[i];
+      len = data.byteLength;
+      sps.push(len >>> 8 & 0xFF);
+      sps.push(len & 0xFF); // SPS
+
+      sps = sps.concat(Array.prototype.slice.call(data));
+    } // assemble the PPSs
+
+
+    for (i = 0; i < track.pps.length; i++) {
+      data = track.pps[i];
+      len = data.byteLength;
+      pps.push(len >>> 8 & 0xFF);
+      pps.push(len & 0xFF);
+      pps = pps.concat(Array.prototype.slice.call(data));
+    }
+
+    var avcc = MP4.box(MP4.types.avcC, new Uint8Array([0x01, // version
+    sps[3], // profile
+    sps[4], // profile compat
+    sps[5], // level
+    0xfc | 3, // lengthSizeMinusOne, hard-coded to 4 bytes
+    0xE0 | track.sps.length // 3bit reserved (111) + numOfSequenceParameterSets
+    ].concat(sps).concat([track.pps.length // numOfPictureParameterSets
+    ]).concat(pps))),
+        // "PPS"
+    width = track.width,
+        height = track.height,
+        hSpacing = track.pixelRatio[0],
+        vSpacing = track.pixelRatio[1];
+    return MP4.box(MP4.types.avc1, new Uint8Array([0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, // reserved
+    0x00, 0x01, // data_reference_index
+    0x00, 0x00, // pre_defined
+    0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // pre_defined
+    width >> 8 & 0xFF, width & 0xff, // width
+    height >> 8 & 0xFF, height & 0xff, // height
+    0x00, 0x48, 0x00, 0x00, // horizresolution
+    0x00, 0x48, 0x00, 0x00, // vertresolution
+    0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x01, // frame_count
+    0x12, 0x64, 0x61, 0x69, 0x6C, // dailymotion/hls.js
+    0x79, 0x6D, 0x6F, 0x74, 0x69, 0x6F, 0x6E, 0x2F, 0x68, 0x6C, 0x73, 0x2E, 0x6A, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // compressorname
+    0x00, 0x18, // depth = 24
+    0x11, 0x11]), // pre_defined = -1
+    avcc, MP4.box(MP4.types.btrt, new Uint8Array([0x00, 0x1c, 0x9c, 0x80, // bufferSizeDB
+    0x00, 0x2d, 0xc6, 0xc0, // maxBitrate
+    0x00, 0x2d, 0xc6, 0xc0])), // avgBitrate
+    MP4.box(MP4.types.pasp, new Uint8Array([hSpacing >> 24, // hSpacing
+    hSpacing >> 16 & 0xFF, hSpacing >> 8 & 0xFF, hSpacing & 0xFF, vSpacing >> 24, // vSpacing
+    vSpacing >> 16 & 0xFF, vSpacing >> 8 & 0xFF, vSpacing & 0xFF])));
+  };
+
+  MP4.esds = function esds(track) {
+    var configlen = track.config.length;
+    return new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    0x03, // descriptor_type
+    0x17 + configlen, // length
+    0x00, 0x01, // es_id
+    0x00, // stream_priority
+    0x04, // descriptor_type
+    0x0f + configlen, // length
+    0x40, // codec : mpeg4_audio
+    0x15, // stream_type
+    0x00, 0x00, 0x00, // buffer_size
+    0x00, 0x00, 0x00, 0x00, // maxBitrate
+    0x00, 0x00, 0x00, 0x00, // avgBitrate
+    0x05 // descriptor_type
+    ].concat([configlen]).concat(track.config).concat([0x06, 0x01, 0x02])); // GASpecificConfig)); // length + audio config descriptor
+  };
+
+  MP4.mp4a = function mp4a(track) {
+    var samplerate = track.samplerate;
+    return MP4.box(MP4.types.mp4a, new Uint8Array([0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, // reserved
+    0x00, 0x01, // data_reference_index
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, track.channelCount, // channelcount
+    0x00, 0x10, // sampleSize:16bits
+    0x00, 0x00, 0x00, 0x00, // reserved2
+    samplerate >> 8 & 0xFF, samplerate & 0xff, //
+    0x00, 0x00]), MP4.box(MP4.types.esds, MP4.esds(track)));
+  };
+
+  MP4.mp3 = function mp3(track) {
+    var samplerate = track.samplerate;
+    return MP4.box(MP4.types['.mp3'], new Uint8Array([0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, 0x00, // reserved
+    0x00, 0x01, // data_reference_index
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, track.channelCount, // channelcount
+    0x00, 0x10, // sampleSize:16bits
+    0x00, 0x00, 0x00, 0x00, // reserved2
+    samplerate >> 8 & 0xFF, samplerate & 0xff, //
+    0x00, 0x00]));
+  };
+
+  MP4.stsd = function stsd(track) {
+    if (track.type === 'audio') {
+      if (!track.isAAC && track.codec === 'mp3') {
+        return MP4.box(MP4.types.stsd, MP4.STSD, MP4.mp3(track));
+      }
+
+      return MP4.box(MP4.types.stsd, MP4.STSD, MP4.mp4a(track));
+    } else {
+      return MP4.box(MP4.types.stsd, MP4.STSD, MP4.avc1(track));
+    }
+  };
+
+  MP4.tkhd = function tkhd(track) {
+    var id = track.id,
+        duration = track.duration * track.timescale,
+        width = track.width,
+        height = track.height,
+        upperWordDuration = Math.floor(duration / (UINT32_MAX + 1)),
+        lowerWordDuration = Math.floor(duration % (UINT32_MAX + 1));
+    return MP4.box(MP4.types.tkhd, new Uint8Array([0x01, // version 1
+    0x00, 0x00, 0x07, // flags
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, // creation_time
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, // modification_time
+    id >> 24 & 0xFF, id >> 16 & 0xFF, id >> 8 & 0xFF, id & 0xFF, // track_ID
+    0x00, 0x00, 0x00, 0x00, // reserved
+    upperWordDuration >> 24, upperWordDuration >> 16 & 0xFF, upperWordDuration >> 8 & 0xFF, upperWordDuration & 0xFF, lowerWordDuration >> 24, lowerWordDuration >> 16 & 0xFF, lowerWordDuration >> 8 & 0xFF, lowerWordDuration & 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // reserved
+    0x00, 0x00, // layer
+    0x00, 0x00, // alternate_group
+    0x00, 0x00, // non-audio track volume
+    0x00, 0x00, // reserved
+    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, // transformation: unity matrix
+    width >> 8 & 0xFF, width & 0xFF, 0x00, 0x00, // width
+    height >> 8 & 0xFF, height & 0xFF, 0x00, 0x00 // height
+    ]));
+  };
+
+  MP4.traf = function traf(track, baseMediaDecodeTime) {
+    var sampleDependencyTable = MP4.sdtp(track),
+        id = track.id,
+        upperWordBaseMediaDecodeTime = Math.floor(baseMediaDecodeTime / (UINT32_MAX + 1)),
+        lowerWordBaseMediaDecodeTime = Math.floor(baseMediaDecodeTime % (UINT32_MAX + 1));
+    return MP4.box(MP4.types.traf, MP4.box(MP4.types.tfhd, new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    id >> 24, id >> 16 & 0XFF, id >> 8 & 0XFF, id & 0xFF])), MP4.box(MP4.types.tfdt, new Uint8Array([0x01, // version 1
+    0x00, 0x00, 0x00, // flags
+    upperWordBaseMediaDecodeTime >> 24, upperWordBaseMediaDecodeTime >> 16 & 0XFF, upperWordBaseMediaDecodeTime >> 8 & 0XFF, upperWordBaseMediaDecodeTime & 0xFF, lowerWordBaseMediaDecodeTime >> 24, lowerWordBaseMediaDecodeTime >> 16 & 0XFF, lowerWordBaseMediaDecodeTime >> 8 & 0XFF, lowerWordBaseMediaDecodeTime & 0xFF])), MP4.trun(track, sampleDependencyTable.length + 16 + // tfhd
+    20 + // tfdt
+    8 + // traf header
+    16 + // mfhd
+    8 + // moof header
+    8), // mdat header
+    sampleDependencyTable);
+  }
+  /**
+   * Generate a track box.
+   * @param track {object} a track definition
+   * @return {Uint8Array} the track box
+   */
+  ;
+
+  MP4.trak = function trak(track) {
+    track.duration = track.duration || 0xffffffff;
+    return MP4.box(MP4.types.trak, MP4.tkhd(track), MP4.mdia(track));
+  };
+
+  MP4.trex = function trex(track) {
+    var id = track.id;
+    return MP4.box(MP4.types.trex, new Uint8Array([0x00, // version 0
+    0x00, 0x00, 0x00, // flags
+    id >> 24, id >> 16 & 0XFF, id >> 8 & 0XFF, id & 0xFF, // track_ID
+    0x00, 0x00, 0x00, 0x01, // default_sample_description_index
+    0x00, 0x00, 0x00, 0x00, // default_sample_duration
+    0x00, 0x00, 0x00, 0x00, // default_sample_size
+    0x00, 0x01, 0x00, 0x01 // default_sample_flags
+    ]));
+  };
+
+  MP4.trun = function trun(track, offset) {
+    var samples = track.samples || [],
+        len = samples.length,
+        arraylen = 12 + 16 * len,
+        array = new Uint8Array(arraylen),
+        i,
+        sample,
+        duration,
+        size,
+        flags,
+        cts;
+    offset += 8 + arraylen;
+    array.set([0x00, // version 0
+    0x00, 0x0f, 0x01, // flags
+    len >>> 24 & 0xFF, len >>> 16 & 0xFF, len >>> 8 & 0xFF, len & 0xFF, // sample_count
+    offset >>> 24 & 0xFF, offset >>> 16 & 0xFF, offset >>> 8 & 0xFF, offset & 0xFF // data_offset
+    ], 0);
+
+    for (i = 0; i < len; i++) {
+      sample = samples[i];
+      duration = sample.duration;
+      size = sample.size;
+      flags = sample.flags;
+      cts = sample.cts;
+      array.set([duration >>> 24 & 0xFF, duration >>> 16 & 0xFF, duration >>> 8 & 0xFF, duration & 0xFF, // sample_duration
+      size >>> 24 & 0xFF, size >>> 16 & 0xFF, size >>> 8 & 0xFF, size & 0xFF, // sample_size
+      flags.isLeading << 2 | flags.dependsOn, flags.isDependedOn << 6 | flags.hasRedundancy << 4 | flags.paddingValue << 1 | flags.isNonSync, flags.degradPrio & 0xF0 << 8, flags.degradPrio & 0x0F, // sample_flags
+      cts >>> 24 & 0xFF, cts >>> 16 & 0xFF, cts >>> 8 & 0xFF, cts & 0xFF // sample_composition_time_offset
+      ], 12 + 16 * i);
+    }
+
+    return MP4.box(MP4.types.trun, array);
+  };
+
+  MP4.initSegment = function initSegment(tracks) {
+    if (!MP4.types) {
+      MP4.init();
+    }
+
+    var movie = MP4.moov(tracks),
+        result;
+    result = new Uint8Array(MP4.FTYP.byteLength + movie.byteLength);
+    result.set(MP4.FTYP);
+    result.set(movie, MP4.FTYP.byteLength);
+    return result;
+  };
+
+  return MP4;
+}();
+
+/* harmony default export */ var mp4_generator = (MP4);
+// EXTERNAL MODULE: ./src/events.js
+var events = __webpack_require__("./src/events.js");
+
+// EXTERNAL MODULE: ./src/errors.ts
+var errors = __webpack_require__("./src/errors.ts");
+
+// EXTERNAL MODULE: ./src/utils/timescale-conversion.ts
+var timescale_conversion = __webpack_require__("./src/utils/timescale-conversion.ts");
+
+// EXTERNAL MODULE: ./src/utils/logger.js
+var logger = __webpack_require__("./src/utils/logger.js");
+
+// CONCATENATED MODULE: ./src/remux/mp4-remuxer.js
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "normalizePts", function() { return normalizePts; });
+/**
+ * fMP4 remuxer
+*/
+
+
+
+
+
+
+var MAX_SILENT_FRAME_DURATION_90KHZ = Object(timescale_conversion["toMpegTsClockFromTimescale"])(10);
+var PTS_DTS_SHIFT_TOLERANCE_90KHZ = Object(timescale_conversion["toMpegTsClockFromTimescale"])(0.2);
+
+var mp4_remuxer_MP4Remuxer =
+/*#__PURE__*/
+function () {
+  function MP4Remuxer(observer, config, typeSupported, vendor) {
+    this.observer = observer;
+    this.config = config;
+    this.typeSupported = typeSupported;
+    var userAgent = navigator.userAgent;
+    this.isSafari = vendor && vendor.indexOf('Apple') > -1 && userAgent && !userAgent.match('CriOS');
+    this.ISGenerated = false;
+  }
+
+  var _proto = MP4Remuxer.prototype;
+
+  _proto.destroy = function destroy() {};
+
+  _proto.resetTimeStamp = function resetTimeStamp(defaultTimeStamp) {
+    this._initPTS = this._initDTS = defaultTimeStamp;
+  };
+
+  _proto.resetInitSegment = function resetInitSegment() {
+    this.ISGenerated = false;
+  };
+
+  _proto.remux = function remux(audioTrack, videoTrack, id3Track, textTrack, timeOffset, contiguous, accurateTimeOffset) {
+    // generate Init Segment if needed
+    if (!this.ISGenerated) {
+      this.generateIS(audioTrack, videoTrack, timeOffset);
+    }
+
+    if (this.ISGenerated) {
+      var nbAudioSamples = audioTrack.samples.length;
+      var nbVideoSamples = videoTrack.samples.length;
+      var audioTimeOffset = timeOffset;
+      var videoTimeOffset = timeOffset;
+
+      if (nbAudioSamples && nbVideoSamples) {
+        // timeOffset is expected to be the offset of the first timestamp of this fragment (first DTS)
+        // if first audio DTS is not aligned with first video DTS then we need to take that into account
+        // when providing timeOffset to remuxAudio / remuxVideo. if we don't do that, there might be a permanent / small
+        // drift between audio and video streams
+        var audiovideoDeltaDts = (audioTrack.samples[0].pts - videoTrack.samples[0].pts) / videoTrack.inputTimeScale;
+        audioTimeOffset += Math.max(0, audiovideoDeltaDts);
+        videoTimeOffset += Math.max(0, -audiovideoDeltaDts);
+      } // Purposefully remuxing audio before video, so that remuxVideo can use nextAudioPts, which is
+      // calculated in remuxAudio.
+      // logger.log('nb AAC samples:' + audioTrack.samples.length);
+
+
+      if (nbAudioSamples) {
+        // if initSegment was generated without video samples, regenerate it again
+        if (!audioTrack.timescale) {
+          logger["logger"].warn('regenerate InitSegment as audio detected');
+          this.generateIS(audioTrack, videoTrack, timeOffset);
+        }
+
+        var audioData = this.remuxAudio(audioTrack, audioTimeOffset, contiguous, accurateTimeOffset); // logger.log('nb AVC samples:' + videoTrack.samples.length);
+
+        if (nbVideoSamples) {
+          var audioTrackLength;
+
+          if (audioData) {
+            audioTrackLength = audioData.endPTS - audioData.startPTS;
+          } // if initSegment was generated without video samples, regenerate it again
+
+
+          if (!videoTrack.timescale) {
+            logger["logger"].warn('regenerate InitSegment as video detected');
+            this.generateIS(audioTrack, videoTrack, timeOffset);
+          }
+
+          this.remuxVideo(videoTrack, videoTimeOffset, contiguous, audioTrackLength, accurateTimeOffset);
+        }
+      } else {
+        // logger.log('nb AVC samples:' + videoTrack.samples.length);
+        if (nbVideoSamples) {
+          var videoData = this.remuxVideo(videoTrack, videoTimeOffset, contiguous, 0, accurateTimeOffset);
+
+          if (videoData && audioTrack.codec) {
+            this.remuxEmptyAudio(audioTrack, audioTimeOffset, contiguous, videoData);
+          }
+        }
+      }
+    } // logger.log('nb ID3 samples:' + audioTrack.samples.length);
+
+
+    if (id3Track.samples.length) {
+      this.remuxID3(id3Track, timeOffset);
+    } // logger.log('nb ID3 samples:' + audioTrack.samples.length);
+
+
+    if (textTrack.samples.length) {
+      this.remuxText(textTrack, timeOffset);
+    } // notify end of parsing
+
+
+    this.observer.trigger(events["default"].FRAG_PARSED);
+  };
+
+  _proto.generateIS = function generateIS(audioTrack, videoTrack, timeOffset) {
+    var observer = this.observer,
+        audioSamples = audioTrack.samples,
+        videoSamples = videoTrack.samples,
+        typeSupported = this.typeSupported,
+        container = 'audio/mp4',
+        tracks = {},
+        data = {
+      tracks: tracks
+    },
+        computePTSDTS = this._initPTS === undefined,
+        initPTS,
+        initDTS,
+        timescale;
+
+    if (computePTSDTS) {
+      initPTS = initDTS = Infinity;
+    }
+
+    if (audioTrack.config && audioSamples.length) {
+      // let's use audio sampling rate as MP4 time scale.
+      // rationale is that there is a integer nb of audio frames per audio sample (1024 for AAC)
+      // using audio sampling rate here helps having an integer MP4 frame duration
+      // this avoids potential rounding issue and AV sync issue
+      audioTrack.timescale = audioTrack.samplerate;
+      logger["logger"].log("audio sampling rate : " + audioTrack.samplerate);
+
+      if (!audioTrack.isAAC) {
+        if (typeSupported.mpeg) {
+          // Chrome and Safari
+          container = 'audio/mpeg';
+          audioTrack.codec = '';
+        } else if (typeSupported.mp3) {
+          // Firefox
+          audioTrack.codec = 'mp3';
+        }
+      }
+
+      tracks.audio = {
+        container: container,
+        codec: audioTrack.codec,
+        initSegment: !audioTrack.isAAC && typeSupported.mpeg ? new Uint8Array() : mp4_generator.initSegment([audioTrack]),
+        metadata: {
+          channelCount: audioTrack.channelCount
+        }
+      };
+
+      if (computePTSDTS) {
+        timescale = audioTrack.inputTimeScale; // remember first PTS of this demuxing context. for audio, PTS = DTS
+
+        initPTS = initDTS = audioSamples[0].pts - Math.round(timescale * timeOffset);
+      }
+    }
+
+    if (videoTrack.sps && videoTrack.pps && videoSamples.length) {
+      // let's use input time scale as MP4 video timescale
+      // we use input time scale straight away to avoid rounding issues on frame duration / cts computation
+      var inputTimeScale = videoTrack.inputTimeScale;
+      videoTrack.timescale = inputTimeScale;
+      tracks.video = {
+        container: 'video/mp4',
+        codec: videoTrack.codec,
+        initSegment: mp4_generator.initSegment([videoTrack]),
+        metadata: {
+          width: videoTrack.width,
+          height: videoTrack.height
+        }
+      };
+
+      if (computePTSDTS) {
+        timescale = videoTrack.inputTimeScale;
+        initPTS = Math.min(initPTS, videoSamples[0].pts - inputTimeScale * timeOffset);
+        initDTS = Math.min(initDTS, videoSamples[0].dts - inputTimeScale * timeOffset);
+        this.observer.trigger(events["default"].INIT_PTS_FOUND, {
+          initPTS: initPTS,
+          timescale: timescale
+        });
+      }
+    }
+
+    if (Object.keys(tracks).length) {
+      observer.trigger(events["default"].FRAG_PARSING_INIT_SEGMENT, data);
+      this.ISGenerated = true;
+
+      if (computePTSDTS) {
+        this._initPTS = initPTS;
+        this._initDTS = initDTS;
+      }
+    } else {
+      observer.trigger(events["default"].ERROR, {
+        type: errors["ErrorTypes"].MEDIA_ERROR,
+        details: errors["ErrorDetails"].FRAG_PARSING_ERROR,
+        fatal: false,
+        reason: 'no audio/video samples found'
+      });
+    }
+  };
+
+  _proto.remuxVideo = function remuxVideo(track, timeOffset, contiguous, audioTrackLength, accurateTimeOffset) {
+    var offset = 8;
+    var mp4SampleDuration;
+    var mdat;
+    var moof;
+    var firstPTS;
+    var firstDTS;
+    var lastPTS;
+    var lastDTS;
+    var timeScale = track.timescale;
+    var inputSamples = track.samples;
+    var outputSamples = [];
+    var nbSamples = inputSamples.length;
+    var ptsNormalize = this._PTSNormalize;
+    var initPTS = this._initPTS; // if parsed fragment is contiguous with last one, let's use last DTS value as reference
+
+    var nextAvcDts = this.nextAvcDts;
+    var isSafari = this.isSafari;
+
+    if (nbSamples === 0) {
+      return;
+    } // Safari does not like overlapping DTS on consecutive fragments. let's use nextAvcDts to overcome this if fragments are consecutive
+
+
+    if (isSafari) {
+      // also consider consecutive fragments as being contiguous (even if a level switch occurs),
+      // for sake of clarity:
+      // consecutive fragments are frags with
+      //  - less than 100ms gaps between new time offset (if accurate) and next expected PTS OR
+      //  - less than 200 ms PTS gaps (timeScale/5)
+      contiguous |= inputSamples.length && nextAvcDts && (accurateTimeOffset && Math.abs(timeOffset - nextAvcDts / timeScale) < 0.1 || Math.abs(inputSamples[0].pts - nextAvcDts - initPTS) < timeScale / 5);
+    }
+
+    if (!contiguous) {
+      // if not contiguous, let's use target timeOffset
+      nextAvcDts = timeOffset * timeScale;
+    } // PTS is coded on 33bits, and can loop from -2^32 to 2^32
+    // ptsNormalize will make PTS/DTS value monotonic, we use last known DTS value as reference value
+
+
+    inputSamples.forEach(function (sample) {
+      sample.pts = ptsNormalize(sample.pts - initPTS, nextAvcDts);
+      sample.dts = ptsNormalize(sample.dts - initPTS, nextAvcDts);
+    }); // sort video samples by DTS then PTS then demux id order
+
+    inputSamples.sort(function (a, b) {
+      var deltadts = a.dts - b.dts;
+      var deltapts = a.pts - b.pts;
+      return deltadts || deltapts || a.id - b.id;
+    }); // handle broken streams with PTS < DTS, tolerance up 0.2 seconds
+
+    var PTSDTSshift = inputSamples.reduce(function (prev, curr) {
+      return Math.max(Math.min(prev, curr.pts - curr.dts), -1 * PTS_DTS_SHIFT_TOLERANCE_90KHZ);
+    }, 0);
+
+    if (PTSDTSshift < 0) {
+      logger["logger"].warn("PTS < DTS detected in video samples, shifting DTS by " + Object(timescale_conversion["toMsFromMpegTsClock"])(PTSDTSshift, true) + " ms to overcome this issue");
+
+      for (var i = 0; i < inputSamples.length; i++) {
+        inputSamples[i].dts += PTSDTSshift;
+      }
+    } // compute first DTS and last DTS, normalize them against reference value
+
+
+    var sample = inputSamples[0];
+    firstDTS = Math.max(sample.dts, 0);
+    firstPTS = Math.max(sample.pts, 0); // check timestamp continuity accross consecutive fragments (this is to remove inter-fragment gap/hole)
+
+    var delta = firstDTS - nextAvcDts; // if fragment are contiguous, detect hole/overlapping between fragments
+
+    if (contiguous) {
+      if (delta) {
+        if (delta > 1) {
+          logger["logger"].log("AVC: " + Object(timescale_conversion["toMsFromMpegTsClock"])(delta, true) + " ms hole between fragments detected,filling it");
+        } else if (delta < -1) {
+          logger["logger"].log("AVC: " + Object(timescale_conversion["toMsFromMpegTsClock"])(-delta, true) + " ms overlapping between fragments detected");
+        } // remove hole/gap : set DTS to next expected DTS
+
+
+        firstDTS = nextAvcDts;
+        inputSamples[0].dts = firstDTS; // offset PTS as well, ensure that PTS is smaller or equal than new DTS
+
+        firstPTS = Math.max(firstPTS - delta, nextAvcDts);
+        inputSamples[0].pts = firstPTS;
+        logger["logger"].log("Video: PTS/DTS adjusted: " + Object(timescale_conversion["toMsFromMpegTsClock"])(firstPTS, true) + "/" + Object(timescale_conversion["toMsFromMpegTsClock"])(firstDTS, true) + ", delta: " + Object(timescale_conversion["toMsFromMpegTsClock"])(delta, true) + " ms");
+      }
+    } // compute lastPTS/lastDTS
+
+
+    sample = inputSamples[inputSamples.length - 1];
+    lastDTS = Math.max(sample.dts, 0);
+    lastPTS = Math.max(sample.pts, 0, lastDTS); // on Safari let's signal the same sample duration for all samples
+    // sample duration (as expected by trun MP4 boxes), should be the delta between sample DTS
+    // set this constant duration as being the avg delta between consecutive DTS.
+
+    if (isSafari) {
+      mp4SampleDuration = Math.round((lastDTS - firstDTS) / (inputSamples.length - 1));
+    }
+
+    var nbNalu = 0,
+        naluLen = 0;
+
+    for (var _i = 0; _i < nbSamples; _i++) {
+      // compute total/avc sample length and nb of NAL units
+      var _sample = inputSamples[_i],
+          units = _sample.units,
+          nbUnits = units.length,
+          sampleLen = 0;
+
+      for (var j = 0; j < nbUnits; j++) {
+        sampleLen += units[j].data.length;
+      }
+
+      naluLen += sampleLen;
+      nbNalu += nbUnits;
+      _sample.length = sampleLen; // normalize PTS/DTS
+
+      if (isSafari) {
+        // sample DTS is computed using a constant decoding offset (mp4SampleDuration) between samples
+        _sample.dts = firstDTS + _i * mp4SampleDuration;
+      } else {
+        // ensure sample monotonic DTS
+        _sample.dts = Math.max(_sample.dts, firstDTS);
+      } // ensure that computed value is greater or equal than sample DTS
+
+
+      _sample.pts = Math.max(_sample.pts, _sample.dts);
+    }
+    /* concatenate the video data and construct the mdat in place
+      (need 8 more bytes to fill length and mpdat type) */
+
+
+    var mdatSize = naluLen + 4 * nbNalu + 8;
+
+    try {
+      mdat = new Uint8Array(mdatSize);
+    } catch (err) {
+      this.observer.trigger(events["default"].ERROR, {
+        type: errors["ErrorTypes"].MUX_ERROR,
+        details: errors["ErrorDetails"].REMUX_ALLOC_ERROR,
+        fatal: false,
+        bytes: mdatSize,
+        reason: "fail allocating video mdat " + mdatSize
+      });
+      return;
+    }
+
+    var view = new DataView(mdat.buffer);
+    view.setUint32(0, mdatSize);
+    mdat.set(mp4_generator.types.mdat, 4);
+
+    for (var _i2 = 0; _i2 < nbSamples; _i2++) {
+      var avcSample = inputSamples[_i2],
+          avcSampleUnits = avcSample.units,
+          mp4SampleLength = 0,
+          compositionTimeOffset = void 0; // convert NALU bitstream to MP4 format (prepend NALU with size field)
+
+      for (var _j = 0, _nbUnits = avcSampleUnits.length; _j < _nbUnits; _j++) {
+        var unit = avcSampleUnits[_j],
+            unitData = unit.data,
+            unitDataLen = unit.data.byteLength;
+        view.setUint32(offset, unitDataLen);
+        offset += 4;
+        mdat.set(unitData, offset);
+        offset += unitDataLen;
+        mp4SampleLength += 4 + unitDataLen;
+      }
+
+      if (!isSafari) {
+        // expected sample duration is the Decoding Timestamp diff of consecutive samples
+        if (_i2 < nbSamples - 1) {
+          mp4SampleDuration = inputSamples[_i2 + 1].dts - avcSample.dts;
+        } else {
+          var config = this.config,
+              lastFrameDuration = avcSample.dts - inputSamples[_i2 > 0 ? _i2 - 1 : _i2].dts;
+
+          if (config.stretchShortVideoTrack) {
+            // In some cases, a segment's audio track duration may exceed the video track duration.
+            // Since we've already remuxed audio, and we know how long the audio track is, we look to
+            // see if the delta to the next segment is longer than maxBufferHole.
+            // If so, playback would potentially get stuck, so we artificially inflate
+            // the duration of the last frame to minimize any potential gap between segments.
+            var maxBufferHole = config.maxBufferHole,
+                gapTolerance = Math.floor(maxBufferHole * timeScale),
+                deltaToFrameEnd = (audioTrackLength ? firstPTS + audioTrackLength * timeScale : this.nextAudioPts) - avcSample.pts;
+
+            if (deltaToFrameEnd > gapTolerance) {
+              // We subtract lastFrameDuration from deltaToFrameEnd to try to prevent any video
+              // frame overlap. maxBufferHole should be >> lastFrameDuration anyway.
+              mp4SampleDuration = deltaToFrameEnd - lastFrameDuration;
+
+              if (mp4SampleDuration < 0) {
+                mp4SampleDuration = lastFrameDuration;
+              }
+
+              logger["logger"].log("It is approximately " + Object(timescale_conversion["toMsFromMpegTsClock"])(deltaToFrameEnd, false) + " ms to the next segment; using duration " + Object(timescale_conversion["toMsFromMpegTsClock"])(mp4SampleDuration, false) + " ms for the last video frame.");
+            } else {
+              mp4SampleDuration = lastFrameDuration;
+            }
+          } else {
+            mp4SampleDuration = lastFrameDuration;
+          }
+        }
+
+        compositionTimeOffset = Math.round(avcSample.pts - avcSample.dts);
+      } else {
+        compositionTimeOffset = Math.max(0, mp4SampleDuration * Math.round((avcSample.pts - avcSample.dts) / mp4SampleDuration));
+      } // console.log('PTS/DTS/initDTS/normPTS/normDTS/relative PTS : ${avcSample.pts}/${avcSample.dts}/${initDTS}/${ptsnorm}/${dtsnorm}/${(avcSample.pts/4294967296).toFixed(3)}');
+
+
+      outputSamples.push({
+        size: mp4SampleLength,
+        // constant duration
+        duration: mp4SampleDuration,
+        cts: compositionTimeOffset,
+        flags: {
+          isLeading: 0,
+          isDependedOn: 0,
+          hasRedundancy: 0,
+          degradPrio: 0,
+          dependsOn: avcSample.key ? 2 : 1,
+          isNonSync: avcSample.key ? 0 : 1
+        }
+      });
+    } // next AVC sample DTS should be equal to last sample DTS + last sample duration (in PES timescale)
+
+
+    this.nextAvcDts = lastDTS + mp4SampleDuration;
+    var dropped = track.dropped;
+    track.nbNalu = 0;
+    track.dropped = 0;
+
+    if (outputSamples.length && navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
+      var flags = outputSamples[0].flags; // chrome workaround, mark first sample as being a Random Access Point to avoid sourcebuffer append issue
+      // https://code.google.com/p/chromium/issues/detail?id=229412
+
+      flags.dependsOn = 2;
+      flags.isNonSync = 0;
+    }
+
+    track.samples = outputSamples;
+    moof = mp4_generator.moof(track.sequenceNumber++, firstDTS, track);
+    track.samples = [];
+    var data = {
+      data1: moof,
+      data2: mdat,
+      startPTS: firstPTS / timeScale,
+      endPTS: (lastPTS + mp4SampleDuration) / timeScale,
+      startDTS: firstDTS / timeScale,
+      endDTS: this.nextAvcDts / timeScale,
+      type: 'video',
+      hasAudio: false,
+      hasVideo: true,
+      nb: outputSamples.length,
+      dropped: dropped
+    };
+    this.observer.trigger(events["default"].FRAG_PARSING_DATA, data);
+    return data;
+  };
+
+  _proto.remuxAudio = function remuxAudio(track, timeOffset, contiguous, accurateTimeOffset) {
+    var inputTimeScale = track.inputTimeScale;
+    var mp4timeScale = track.timescale;
+    var scaleFactor = inputTimeScale / mp4timeScale;
+    var mp4SampleDuration = track.isAAC ? 1024 : 1152;
+    var inputSampleDuration = mp4SampleDuration * scaleFactor;
+    var ptsNormalize = this._PTSNormalize;
+    var initPTS = this._initPTS;
+    var rawMPEG = !track.isAAC && this.typeSupported.mpeg;
+    var mp4Sample;
+    var fillFrame;
+    var mdat;
+    var moof;
+    var firstPTS;
+    var lastPTS;
+    var offset = rawMPEG ? 0 : 8;
+    var inputSamples = track.samples;
+    var outputSamples = [];
+    var nextAudioPts = this.nextAudioPts; // for audio samples, also consider consecutive fragments as being contiguous (even if a level switch occurs),
+    // for sake of clarity:
+    // consecutive fragments are frags with
+    //  - less than 100ms gaps between new time offset (if accurate) and next expected PTS OR
+    //  - less than 20 audio frames distance
+    // contiguous fragments are consecutive fragments from same quality level (same level, new SN = old SN + 1)
+    // this helps ensuring audio continuity
+    // and this also avoids audio glitches/cut when switching quality, or reporting wrong duration on first audio frame
+
+    contiguous |= inputSamples.length && nextAudioPts && (accurateTimeOffset && Math.abs(timeOffset - nextAudioPts / inputTimeScale) < 0.1 || Math.abs(inputSamples[0].pts - nextAudioPts - initPTS) < 20 * inputSampleDuration); // compute normalized PTS
+
+    inputSamples.forEach(function (sample) {
+      sample.pts = sample.dts = ptsNormalize(sample.pts - initPTS, timeOffset * inputTimeScale);
+    }); // filter out sample with negative PTS that are not playable anyway
+    // if we don't remove these negative samples, they will shift all audio samples forward.
+    // leading to audio overlap between current / next fragment
+
+    inputSamples = inputSamples.filter(function (sample) {
+      return sample.pts >= 0;
+    }); // in case all samples have negative PTS, and have been filtered out, return now
+
+    if (inputSamples.length === 0) {
+      return;
+    }
+
+    if (!contiguous) {
+      if (!accurateTimeOffset) {
+        // if frag are mot contiguous and if we cant trust time offset, let's use first sample PTS as next audio PTS
+        nextAudioPts = inputSamples[0].pts;
+      } else {
+        // if timeOffset is accurate, let's use it as predicted next audio PTS
+        nextAudioPts = timeOffset * inputTimeScale;
+      }
+    } // If the audio track is missing samples, the frames seem to get "left-shifted" within the
+    // resulting mp4 segment, causing sync issues and leaving gaps at the end of the audio segment.
+    // In an effort to prevent this from happening, we inject frames here where there are gaps.
+    // When possible, we inject a silent frame; when that's not possible, we duplicate the last
+    // frame.
+
+
+    if (track.isAAC) {
+      var maxAudioFramesDrift = this.config.maxAudioFramesDrift;
+
+      for (var i = 0, nextPts = nextAudioPts; i < inputSamples.length;) {
+        // First, let's see how far off this frame is from where we expect it to be
+        var sample = inputSamples[i],
+            delta;
+        var pts = sample.pts;
+        delta = pts - nextPts; // If we're overlapping by more than a duration, drop this sample
+
+        if (delta <= -maxAudioFramesDrift * inputSampleDuration) {
+          logger["logger"].warn("Dropping 1 audio frame @ " + Object(timescale_conversion["toMsFromMpegTsClock"])(nextPts, true) + " ms due to " + Object(timescale_conversion["toMsFromMpegTsClock"])(delta, true) + " ms overlap.");
+          inputSamples.splice(i, 1); // Don't touch nextPtsNorm or i
+        } // eslint-disable-line brace-style
+        // Insert missing frames if:
+        // 1: We're more than maxAudioFramesDrift frame away
+        // 2: Not more than MAX_SILENT_FRAME_DURATION away
+        // 3: currentTime (aka nextPtsNorm) is not 0
+        else if (delta >= maxAudioFramesDrift * inputSampleDuration && delta < MAX_SILENT_FRAME_DURATION_90KHZ && nextPts) {
+            var missing = Math.round(delta / inputSampleDuration);
+            logger["logger"].warn("Injecting " + missing + " audio frames @ " + Object(timescale_conversion["toMsFromMpegTsClock"])(nextPts, true) + " ms due to " + Object(timescale_conversion["toMsFromMpegTsClock"])(nextPts, true) + " ms gap.");
+
+            for (var j = 0; j < missing; j++) {
+              var newStamp = Math.max(nextPts, 0);
+              fillFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
+
+              if (!fillFrame) {
+                logger["logger"].log('Unable to get silent frame for given audio codec; duplicating last frame instead.');
+                fillFrame = sample.unit.subarray();
+              }
+
+              inputSamples.splice(i, 0, {
+                unit: fillFrame,
+                pts: newStamp,
+                dts: newStamp
+              });
+              nextPts += inputSampleDuration;
+              i++;
+            } // Adjust sample to next expected pts
+
+
+            sample.pts = sample.dts = nextPts;
+            nextPts += inputSampleDuration;
+            i++;
+          } else {
+            // Otherwise, just adjust pts
+            if (Math.abs(delta) > 0.1 * inputSampleDuration) {// logger.log(`Invalid frame delta ${Math.round(delta + inputSampleDuration)} at PTS ${Math.round(pts / 90)} (should be ${Math.round(inputSampleDuration)}).`);
+            }
+
+            sample.pts = sample.dts = nextPts;
+            nextPts += inputSampleDuration;
+            i++;
+          }
+      }
+    } // compute mdat size, as we eventually filtered/added some samples
+
+
+    var nbSamples = inputSamples.length;
+    var mdatSize = 0;
+
+    while (nbSamples--) {
+      mdatSize += inputSamples[nbSamples].unit.byteLength;
+    }
+
+    for (var _j2 = 0, _nbSamples = inputSamples.length; _j2 < _nbSamples; _j2++) {
+      var audioSample = inputSamples[_j2];
+      var unit = audioSample.unit;
+      var _pts = audioSample.pts; // logger.log(`Audio/PTS:${toMsFromMpegTsClock(pts, true)}`);
+      // if not first sample
+
+      if (lastPTS !== undefined) {
+        mp4Sample.duration = Math.round((_pts - lastPTS) / scaleFactor);
+      } else {
+        var _delta = _pts - nextAudioPts;
+
+        var numMissingFrames = 0; // if fragment are contiguous, detect hole/overlapping between fragments
+        // contiguous fragments are consecutive fragments from same quality level (same level, new SN = old SN + 1)
+
+        if (contiguous && track.isAAC) {
+          // log delta
+          if (_delta) {
+            if (_delta > 0 && _delta < MAX_SILENT_FRAME_DURATION_90KHZ) {
+              // Q: why do we have to round here, shouldn't this always result in an integer if timestamps are correct,
+              // and if not, shouldn't we actually Math.ceil() instead?
+              numMissingFrames = Math.round((_pts - nextAudioPts) / inputSampleDuration);
+              logger["logger"].log(Object(timescale_conversion["toMsFromMpegTsClock"])(_delta, true) + " ms hole between AAC samples detected,filling it");
+
+              if (numMissingFrames > 0) {
+                fillFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
+
+                if (!fillFrame) {
+                  fillFrame = unit.subarray();
+                }
+
+                mdatSize += numMissingFrames * fillFrame.length;
+              } // if we have frame overlap, overlapping for more than half a frame duraion
+
+            } else if (_delta < -12) {
+              // drop overlapping audio frames... browser will deal with it
+              logger["logger"].log("drop overlapping AAC sample, expected/parsed/delta: " + Object(timescale_conversion["toMsFromMpegTsClock"])(nextAudioPts, true) + " ms / " + Object(timescale_conversion["toMsFromMpegTsClock"])(_pts, true) + " ms / " + Object(timescale_conversion["toMsFromMpegTsClock"])(-_delta, true) + " ms");
+              mdatSize -= unit.byteLength;
+              continue;
+            } // set PTS/DTS to expected PTS/DTS
+
+
+            _pts = nextAudioPts;
+          }
+        } // remember first PTS of our audioSamples
+
+
+        firstPTS = _pts;
+
+        if (mdatSize > 0) {
+          mdatSize += offset;
+
+          try {
+            mdat = new Uint8Array(mdatSize);
+          } catch (err) {
+            this.observer.trigger(events["default"].ERROR, {
+              type: errors["ErrorTypes"].MUX_ERROR,
+              details: errors["ErrorDetails"].REMUX_ALLOC_ERROR,
+              fatal: false,
+              bytes: mdatSize,
+              reason: "fail allocating audio mdat " + mdatSize
+            });
+            return;
+          }
+
+          if (!rawMPEG) {
+            var view = new DataView(mdat.buffer);
+            view.setUint32(0, mdatSize);
+            mdat.set(mp4_generator.types.mdat, 4);
+          }
+        } else {
+          // no audio samples
+          return;
+        }
+
+        for (var _i3 = 0; _i3 < numMissingFrames; _i3++) {
+          fillFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
+
+          if (!fillFrame) {
+            logger["logger"].log('Unable to get silent frame for given audio codec; duplicating this frame instead.');
+            fillFrame = unit.subarray();
+          }
+
+          mdat.set(fillFrame, offset);
+          offset += fillFrame.byteLength;
+          mp4Sample = {
+            size: fillFrame.byteLength,
+            cts: 0,
+            duration: 1024,
+            flags: {
+              isLeading: 0,
+              isDependedOn: 0,
+              hasRedundancy: 0,
+              degradPrio: 0,
+              dependsOn: 1
+            }
+          };
+          outputSamples.push(mp4Sample);
+        }
+      }
+
+      mdat.set(unit, offset);
+      var unitLen = unit.byteLength;
+      offset += unitLen; // console.log('PTS/DTS/initDTS/normPTS/normDTS/relative PTS : ${audioSample.pts}/${audioSample.dts}/${initDTS}/${ptsnorm}/${dtsnorm}/${(audioSample.pts/4294967296).toFixed(3)}');
+
+      mp4Sample = {
+        size: unitLen,
+        cts: 0,
+        duration: 0,
+        flags: {
+          isLeading: 0,
+          isDependedOn: 0,
+          hasRedundancy: 0,
+          degradPrio: 0,
+          dependsOn: 1
+        }
+      };
+      outputSamples.push(mp4Sample);
+      lastPTS = _pts;
+    }
+
+    var lastSampleDuration = 0;
+    nbSamples = outputSamples.length; // set last sample duration as being identical to previous sample
+
+    if (nbSamples >= 2) {
+      lastSampleDuration = outputSamples[nbSamples - 2].duration;
+      mp4Sample.duration = lastSampleDuration;
+    }
+
+    if (nbSamples) {
+      // next audio sample PTS should be equal to last sample PTS + duration
+      this.nextAudioPts = nextAudioPts = lastPTS + scaleFactor * lastSampleDuration; // logger.log('Audio/PTS/PTSend:' + audioSample.pts.toFixed(0) + '/' + this.nextAacDts.toFixed(0));
+
+      track.samples = outputSamples;
+
+      if (rawMPEG) {
+        moof = new Uint8Array();
+      } else {
+        moof = mp4_generator.moof(track.sequenceNumber++, firstPTS / scaleFactor, track);
+      }
+
+      track.samples = [];
+      var start = firstPTS / inputTimeScale;
+      var end = nextAudioPts / inputTimeScale;
+      var audioData = {
+        data1: moof,
+        data2: mdat,
+        startPTS: start,
+        endPTS: end,
+        startDTS: start,
+        endDTS: end,
+        type: 'audio',
+        hasAudio: true,
+        hasVideo: false,
+        nb: nbSamples
+      };
+      this.observer.trigger(events["default"].FRAG_PARSING_DATA, audioData);
+      return audioData;
+    }
+
+    return null;
+  };
+
+  _proto.remuxEmptyAudio = function remuxEmptyAudio(track, timeOffset, contiguous, videoData) {
+    var inputTimeScale = track.inputTimeScale;
+    var mp4timeScale = track.samplerate ? track.samplerate : inputTimeScale;
+    var scaleFactor = inputTimeScale / mp4timeScale;
+    var nextAudioPts = this.nextAudioPts; // sync with video's timestamp
+
+    var startDTS = (nextAudioPts !== undefined ? nextAudioPts : videoData.startDTS * inputTimeScale) + this._initDTS;
+    var endDTS = videoData.endDTS * inputTimeScale + this._initDTS; // one sample's duration value
+
+    var sampleDuration = 1024;
+    var frameDuration = scaleFactor * sampleDuration; // samples count of this segment's duration
+
+    var nbSamples = Math.ceil((endDTS - startDTS) / frameDuration); // silent frame
+
+    var silentFrame = aac_helper.getSilentFrame(track.manifestCodec || track.codec, track.channelCount);
+    logger["logger"].warn('remux empty Audio'); // Can't remux if we can't generate a silent frame...
+
+    if (!silentFrame) {
+      logger["logger"].trace('Unable to remuxEmptyAudio since we were unable to get a silent frame for given audio codec!');
+      return;
+    }
+
+    var samples = [];
+
+    for (var i = 0; i < nbSamples; i++) {
+      var stamp = startDTS + i * frameDuration;
+      samples.push({
+        unit: silentFrame,
+        pts: stamp,
+        dts: stamp
+      });
+    }
+
+    track.samples = samples;
+    this.remuxAudio(track, timeOffset, contiguous);
+  };
+
+  _proto.remuxID3 = function remuxID3(track) {
+    var length = track.samples.length,
+        sample;
+    var inputTimeScale = track.inputTimeScale;
+    var initPTS = this._initPTS;
+    var initDTS = this._initDTS; // consume samples
+
+    if (length) {
+      for (var index = 0; index < length; index++) {
+        sample = track.samples[index]; // setting id3 pts, dts to relative time
+        // using this._initPTS and this._initDTS to calculate relative time
+
+        sample.pts = (sample.pts - initPTS) / inputTimeScale;
+        sample.dts = (sample.dts - initDTS) / inputTimeScale;
+      }
+
+      this.observer.trigger(events["default"].FRAG_PARSING_METADATA, {
+        samples: track.samples
+      });
+    }
+
+    track.samples = [];
+  };
+
+  _proto.remuxText = function remuxText(track) {
+    track.samples.sort(function (a, b) {
+      return a.pts - b.pts;
+    });
+    var length = track.samples.length,
+        sample;
+    var inputTimeScale = track.inputTimeScale;
+    var initPTS = this._initPTS; // consume samples
+
+    if (length) {
+      for (var index = 0; index < length; index++) {
+        sample = track.samples[index]; // setting text pts, dts to relative time
+        // using this._initPTS and this._initDTS to calculate relative time
+
+        sample.pts = (sample.pts - initPTS) / inputTimeScale;
+      }
+
+      this.observer.trigger(events["default"].FRAG_PARSING_USERDATA, {
+        samples: track.samples
+      });
+    }
+
+    track.samples = [];
+  };
+
+  _proto._PTSNormalize = function _PTSNormalize(value, reference) {
+    var offset;
+
+    if (reference === undefined) {
+      return value;
+    }
+
+    if (reference < value) {
+      // - 2^33
+      offset = -8589934592;
+    } else {
+      // + 2^33
+      offset = 8589934592;
+    }
+    /* PTS is 33bit (from 0 to 2^33 -1)
+      if diff between value and reference is bigger than half of the amplitude (2^32) then it means that
+      PTS looping occured. fill the gap */
+
+
+    while (Math.abs(value - reference) > 4294967296) {
+      value += offset;
+    }
+
+    return value;
+  };
+
+  return MP4Remuxer;
+}();
+
+function normalizePts(value, reference) {
+  var offset;
+
+  if (reference === null) {
+    return value;
+  }
+
+  if (reference < value) {
+    // - 2^33
+    offset = -8589934592;
+  } else {
+    // + 2^33
+    offset = 8589934592;
+  }
+  /* PTS is 33bit (from 0 to 2^33 -1)
+    if diff between value and reference is bigger than half of the amplitude (2^32) then it means that
+    PTS looping occured. fill the gap */
+
+
+  while (Math.abs(value - reference) > 4294967296) {
+    value += offset;
+  }
+
+  return value;
+}
+/* harmony default export */ var mp4_remuxer = __webpack_exports__["default"] = (mp4_remuxer_MP4Remuxer);
+
+/***/ }),
+
 /***/ "./src/utils/get-self-scope.js":
 /*!*************************************!*\
   !*** ./src/utils/get-self-scope.js ***!
@@ -21264,6 +21301,61 @@ var enableLogs = function enableLogs(debugConfig) {
   }
 };
 var logger = exportedLogger;
+
+/***/ }),
+
+/***/ "./src/utils/timescale-conversion.ts":
+/*!*******************************************!*\
+  !*** ./src/utils/timescale-conversion.ts ***!
+  \*******************************************/
+/*! exports provided: toTimescaleFromScale, toTimescaleFromBase, toMsFromMpegTsClock, toMpegTsClockFromTimescale */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toTimescaleFromScale", function() { return toTimescaleFromScale; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toTimescaleFromBase", function() { return toTimescaleFromBase; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toMsFromMpegTsClock", function() { return toMsFromMpegTsClock; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toMpegTsClockFromTimescale", function() { return toMpegTsClockFromTimescale; });
+var MPEG_TS_CLOCK_FREQ_HZ = 90000;
+function toTimescaleFromScale(value, destScale, srcScale, round) {
+  if (srcScale === void 0) {
+    srcScale = 1;
+  }
+
+  if (round === void 0) {
+    round = false;
+  }
+
+  return toTimescaleFromBase(value, destScale, 1 / srcScale);
+}
+function toTimescaleFromBase(value, destScale, srcBase, round) {
+  if (srcBase === void 0) {
+    srcBase = 1;
+  }
+
+  if (round === void 0) {
+    round = false;
+  }
+
+  var result = value * destScale * srcBase; // equivalent to `(value * scale) / (1 / base)`
+
+  return round ? Math.round(result) : result;
+}
+function toMsFromMpegTsClock(value, round) {
+  if (round === void 0) {
+    round = false;
+  }
+
+  return toTimescaleFromBase(value, 1000, 1 / MPEG_TS_CLOCK_FREQ_HZ, round);
+}
+function toMpegTsClockFromTimescale(value, srcScale) {
+  if (srcScale === void 0) {
+    srcScale = 1;
+  }
+
+  return toTimescaleFromBase(value, MPEG_TS_CLOCK_FREQ_HZ, 1 / srcScale);
+}
 
 /***/ })
 
