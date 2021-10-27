@@ -19413,7 +19413,7 @@ function (_BaseStreamController) {
   ;
 
   _proto.onError = function onError(data) {
-    //Commenting out this code since we need to reset the state for any error
+    // Commenting out this code since we need to reset the state for any error
     // let frag = data.frag;
     // // don't handle error not related to subtitle fragment
     // if (!frag || frag.type !== 'subtitle') {
@@ -19554,13 +19554,11 @@ function (_BaseStreamController) {
               foundFrag = findFragmentByPTS(fragPrevious, fragments, bufferEnd, maxFragLookUpTolerance);
             }
 
-            if (!foundFrag && trackDetails.live && fragPrevious && fragPrevious.start < fragments[0].start) {
+            if (!foundFrag && fragPrevious && fragPrevious.start < fragments[0].start) {
               /*
-              below is a real world example of what can happen in production. 
-              
-              fragPrevious  s:04:08:44.000Z, e:04:08:49.000Z -- was found by PDT
-              
-              # response on subtitle/en/playlist.m3u8 on Nth call
+              below is a real world example of what can happen in production.
+               fragPrevious  s:04:08:44.000Z, e:04:08:49.000Z -- was found by PDT
+               # response on subtitle/en/playlist.m3u8 on Nth call
               fragments[0]: s:04:08:24.000Z, e:04:08:29.000Z -- s:4532.900002, e:4537.900002
               fragments[1]: s:04:08:29.000Z, e:04:08:34.000Z -- s:4537.900002, e:4542.900002
               fragments[2]: s:04:08:34.000Z, e:04:08:39.000Z -- s:4542.900002, e:4547.900002
@@ -19587,13 +19585,17 @@ function (_BaseStreamController) {
             this.hls.trigger(events["default"].KEY_LOADING, {
               frag: foundFrag
             });
-          } else if (foundFrag && this.fragmentTracker.getState(foundFrag) === FragmentState.NOT_LOADED) {
-            // only load if fragment is not loaded        
-            this.fragCurrent = foundFrag;
-            this.state = State.FRAG_LOADING;
-            this.hls.trigger(events["default"].FRAG_LOADING, {
-              frag: foundFrag
-            });
+          } else if (foundFrag) {
+            if (fragmentTracker.getState(foundFrag) === FragmentState.NOT_LOADED) {
+              // only load if fragment is not loaded
+              this.fragCurrent = foundFrag;
+              this.state = State.FRAG_LOADING;
+              this.hls.trigger(events["default"].FRAG_LOADING, {
+                frag: foundFrag
+              });
+            } else {
+              this.fragPrevious = foundFrag;
+            }
           }
         }
     }
