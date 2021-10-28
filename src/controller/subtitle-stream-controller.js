@@ -255,10 +255,12 @@ export class SubtitleStreamController extends BaseStreamController {
       } else if (foundFrag) {
         if (fragmentTracker.getState(foundFrag) === FragmentState.NOT_LOADED) {
           // only load if fragment is not loaded
+          logger.log('Fragment not loaded yet, loading now');
           this.fragCurrent = foundFrag;
           this.state = State.FRAG_LOADING;
           this.hls.trigger(Event.FRAG_LOADING, { frag: foundFrag });
         } else {
+          logger.log('Fragment already loaded');
           this.fragPrevious = foundFrag;
         }
       }
