@@ -98,7 +98,7 @@ export class SubtitleStreamController extends BaseStreamController {
 
   // If something goes wrong, proceed to next frag, if we were processing one.
   onError (data) {
-    //Commenting out this code since we need to reset the state for any error
+    // Commenting out this code since we need to reset the state for any error
     // let frag = data.frag;
     // // don't handle error not related to subtitle fragment
     // if (!frag || frag.type !== 'subtitle') {
@@ -218,12 +218,12 @@ export class SubtitleStreamController extends BaseStreamController {
         if (!foundFrag) {
           foundFrag = findFragmentByPTS(fragPrevious, fragments, bufferEnd, maxFragLookUpTolerance);
         }
-        if (!foundFrag && trackDetails.live && fragPrevious && fragPrevious.start < fragments[0].start) {
+        if (!foundFrag && fragPrevious && fragPrevious.start < fragments[0].start) {
           /*
-          below is a real world example of what can happen in production. 
-          
+          below is a real world example of what can happen in production.
+
           fragPrevious  s:04:08:44.000Z, e:04:08:49.000Z -- was found by PDT
-          
+
           # response on subtitle/en/playlist.m3u8 on Nth call
           fragments[0]: s:04:08:24.000Z, e:04:08:29.000Z -- s:4532.900002, e:4537.900002
           fragments[1]: s:04:08:29.000Z, e:04:08:34.000Z -- s:4537.900002, e:4542.900002
@@ -240,11 +240,10 @@ export class SubtitleStreamController extends BaseStreamController {
 
           # notice the gap from e:04:08:49.000Z to s:04:08:54.000Z, code below is to fix this issue
           */
-          
-         foundFrag = fragments[0];
-         logger.warn(`Gap detected in live subtitle playlist, using next available fragment {start: ${foundFrag.start}}`);
-        }
 
+          foundFrag = fragments[0];
+          logger.warn(`Gap detected in live subtitle playlist, using next available fragment {start: ${foundFrag.start}}`);
+        }
       } else {
         foundFrag = fragments[fragLen - 1];
       }
@@ -253,11 +252,17 @@ export class SubtitleStreamController extends BaseStreamController {
         logger.log(`Loading key for ${foundFrag.sn}`);
         this.state = State.KEY_LOADING;
         this.hls.trigger(Event.KEY_LOADING, { frag: foundFrag });
-      } else if (foundFrag && this.fragmentTracker.getState(foundFrag) === FragmentState.NOT_LOADED) {
-        // only load if fragment is not loaded        
-        this.fragCurrent = foundFrag;
-        this.state = State.FRAG_LOADING;
-        this.hls.trigger(Event.FRAG_LOADING, { frag: foundFrag });
+      } else if (foundFrag) {
+        if (fragmentTracker.getState(foundFrag) === FragmentState.NOT_LOADED) {
+          // only load if fragment is not loaded
+          logger.log('Fragment not loaded yet, loading now');
+          this.fragCurrent = foundFrag;
+          this.state = State.FRAG_LOADING;
+          this.hls.trigger(Event.FRAG_LOADING, { frag: foundFrag });
+        } else {
+          logger.log('Fragment already loaded');
+          this.fragPrevious = foundFrag;
+        }
       }
     }
     }
