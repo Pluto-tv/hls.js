@@ -8842,6 +8842,32 @@ function (_EventHandler) {
 
   _proto.removeAllFragments = function removeAllFragments() {
     this.fragments = Object.create(null);
+  }
+  /**
+  * @param {number} start
+  * @param {number} end
+  * @param {string} playlistType
+  */
+  ;
+
+  _proto.removeFragmentsInRange = function removeFragmentsInRange(start, end, playlistType) {
+    var _this6 = this;
+
+    Object.keys(this.fragments).forEach(function (key) {
+      var fragmentEntity = _this6.fragments[key];
+
+      if (!fragmentEntity) {
+        return;
+      }
+
+      if (fragmentEntity.buffered) {
+        var frag = fragmentEntity.body;
+
+        if (frag.type === playlistType && frag.start < end && frag.end > start) {
+          _this6.removeFragment(frag);
+        }
+      }
+    });
   };
 
   return FragmentTracker;

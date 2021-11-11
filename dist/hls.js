@@ -8865,6 +8865,32 @@ function (_EventHandler) {
 
   _proto.removeAllFragments = function removeAllFragments() {
     this.fragments = Object.create(null);
+  }
+  /**
+  * @param {number} start
+  * @param {number} end
+  * @param {string} playlistType
+  */
+  ;
+
+  _proto.removeFragmentsInRange = function removeFragmentsInRange(start, end, playlistType) {
+    var _this6 = this;
+
+    Object.keys(this.fragments).forEach(function (key) {
+      var fragmentEntity = _this6.fragments[key];
+
+      if (!fragmentEntity) {
+        return;
+      }
+
+      if (fragmentEntity.buffered) {
+        var frag = fragmentEntity.body;
+
+        if (frag.type === playlistType && frag.start < end && frag.end > start) {
+          _this6.removeFragment(frag);
+        }
+      }
+    });
   };
 
   return FragmentTracker;
@@ -19318,6 +19344,7 @@ function subtitle_stream_controller_inheritsLoose(subClass, superClass) { subCla
 
 
 
+
 var subtitle_stream_controller_window = window,
     subtitle_stream_controller_performance = subtitle_stream_controller_window.performance;
 var subtitle_stream_controller_TICK_INTERVAL = 500; // how often to tick in ms
@@ -19614,6 +19641,26 @@ function (_BaseStreamController) {
   };
 
   _proto.onMediaSeeking = function onMediaSeeking() {
+    // Find the currently showing subtitle track
+    var tracks = Array.from(this.media.textTracks); // eslint-disable-next-line no-restricted-properties
+
+    var track = tracks.find(function (track) {
+      return track.mode !== 'disabled' && (track.kind === 'subtitles' || track.kind === 'captions');
+    }); // Manually reset the cues and fragments
+
+    if (track && track.cues) {
+      // Clear all text track cues
+      Array.from(track.cues).forEach(function (cue) {
+        return track.removeCue(cue);
+      }); // Clear all loaded subtitle fragments
+
+      this.fragmentTracker.removeFragmentsInRange(0, this.media.duration, PlaylistLevelType.SUBTITLE); // Clear internal buffered lists
+
+      this.tracksBuffered.forEach(function (_, index, tracks) {
+        tracks[index] = [];
+      });
+    }
+
     this.fragPrevious = null;
   };
 

@@ -289,4 +289,28 @@ export class FragmentTracker extends EventHandler {
   removeAllFragments () {
     this.fragments = Object.create(null);
   }
+
+  /**
+  * @param {number} start
+  * @param {number} end
+  * @param {string} playlistType
+  */
+  removeFragmentsInRange (start, end, playlistType) {
+    Object.keys(this.fragments).forEach((key) => {
+      const fragmentEntity = this.fragments[key];
+      if (!fragmentEntity) {
+        return;
+      }
+      if (fragmentEntity.buffered) {
+        const frag = fragmentEntity.body;
+        if (
+          frag.type === playlistType &&
+          frag.start < end &&
+          frag.end > start
+        ) {
+          this.removeFragment(frag);
+        }
+      }
+    });
+  }
 }
