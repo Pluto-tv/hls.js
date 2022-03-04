@@ -10,6 +10,7 @@ import { findFragmentByPDT, findFragmentByPTS } from './fragment-finders';
 import { FragmentState } from './fragment-tracker';
 import BaseStreamController, { State } from './base-stream-controller';
 import { mergeSubtitlePlaylists } from './level-helper';
+import { PlaylistLevelType } from '../types/loader';
 
 const { performance } = window;
 const TICK_INTERVAL = 500; // how often to tick in ms
@@ -278,6 +279,22 @@ export class SubtitleStreamController extends BaseStreamController {
   }
 
   onMediaSeeking () {
+    // Find the currently showing subtitle track
+    const tracks = Array.from(this.media.textTracks);
+    const track = tracks.find(track => track.mode !== 'disabled' && (track.kind === 'subtitles' || track.kind === 'captions'));
+
+    // Manually reset the cues and fragments
+    if (track && track.cues) {
+      // Clear all text track cues
+      Array.from(track.cues).forEach(cue => track.removeCue(cue));
+      // Clear all loaded subtitle fragments
+      this.fragmentTracker.removeFragmentsInRange(0, this.media.duration, PlaylistLevelType.SUBTITLE);
+
+      // Clear internal buffered lists
+      this.tracksBuffered.forEach((_, index, tracks) => {
+        tracks[ index ] = [];
+      });
+    }
     this.fragPrevious = null;
   }
 }
