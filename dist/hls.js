@@ -18769,7 +18769,7 @@ function (_EventHandler) {
 
         if (track.default) {
           textTrack.mode = _this3.hls.subtitleDisplay ? 'showing' : 'hidden';
-        } else {
+        } else if (textTrack) {
           textTrack.mode = 'disabled';
         }
 

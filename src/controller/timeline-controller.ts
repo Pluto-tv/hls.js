@@ -218,7 +218,7 @@ class TimelineController extends EventHandler {
 
         if (track.default) {
           textTrack.mode = this.hls.subtitleDisplay ? 'showing' : 'hidden';
-        } else {
+        } else if (textTrack) {
           textTrack.mode = 'disabled';
         }
 
