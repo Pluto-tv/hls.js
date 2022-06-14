@@ -82,9 +82,10 @@ const Cues: CuesInterface = {
         if (cueA.line === 'auto' || cueB.line === 'auto') {
           return 0;
         }
-        if (cueA.line > 8 && cueB.line > 8) {
-          return cueB.line - cueA.line;
-        }
+        // TODO: These lines cause captions to render out of order in some 608/708 cases.
+        // if (cueA.line > 8 && cueB.line > 8) {
+        //   return cueB.line - cueA.line;
+        // }
         return cueA.line - cueB.line;
       });
       result.forEach((cue) => addCueToTrack(track, cue));
