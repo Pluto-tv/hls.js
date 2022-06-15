@@ -1,9 +1,9 @@
-import { fixLineBreaks } from './vttparser';
 import type { CaptionScreen, Row } from './cea-608-parser';
-import { generateCueId } from './webvtt-parser';
-import { addCueToTrack } from './texttrack-utils';
+import { fixLineBreaks } from './vttparser';
+// import { generateCueId } from './webvtt-parser';
+// import { addCueToTrack } from './texttrack-utils';
 
-const WHITESPACE_CHAR = /\s/;
+// const WHITESPACE_CHAR = /\s/;
 
 export interface CuesInterface {
   newCue(
@@ -28,7 +28,7 @@ const Cues: CuesInterface = {
     let indenting: boolean;
     let indent: number;
     let text: string;
-    const Cue = (self.VTTCue || self.TextTrackCue) as any;
+    // const Cue = (self.VTTCue || self.TextTrackCue) as any;
 
     for (let r = 0; r < captionScreen.rows.length; r++) {
       row = captionScreen.rows[r];
@@ -38,7 +38,7 @@ const Cues: CuesInterface = {
 
       if (!row.isEmpty()) {
         for (let c = 0; c < row.chars.length; c++) {
-          if (WHITESPACE_CHAR.test(row.chars[c].uchar) && indenting) {
+          if (row.chars[c].uchar.match(/\s/) && indenting) {
             indent++;
           } else {
             text += row.chars[c].uchar;
@@ -53,43 +53,29 @@ const Cues: CuesInterface = {
           endTime += 0.0001;
         }
 
+        cue = new VTTCue(startTime, endTime, fixLineBreaks(text.trim()));
+
         if (indent >= 16) {
           indent--;
         } else {
           indent++;
         }
 
-        const cueText = fixLineBreaks(text.trim());
-        const id = generateCueId(startTime, endTime, cueText);
-
-        // If this cue already exists in the track do not push it
-        if (!track?.cues?.getCueById(id)) {
-          cue = new Cue(startTime, endTime, cueText);
-          cue.id = id;
+        // VTTCue.line get's flakey when using controls, so let's now include line 13&14
+        // also, drop line 1 since it's to close to the top
+        if (navigator.userAgent.match(/Firefox\//)) {
           cue.line = r + 1;
-          cue.align = 'left';
-          // Clamp the position between 10 and 80 percent (CEA-608 PAC indent code)
-          // https://dvcs.w3.org/hg/text-tracks/raw-file/default/608toVTT/608toVTT.html#positioning-in-cea-608
-          // Firefox throws an exception and captions break with out of bounds 0-100 values
-          cue.position = 10 + Math.min(80, Math.floor((indent * 8) / 32) * 10);
-          result.push(cue);
+        } else {
+          cue.line = r > 7 ? r - 2 : r + 1;
         }
+
+        cue.align = 'left';
+        // Clamp the position between 0 and 100 - if out of these bounds, Firefox throws an exception and captions break
+        cue.position = Math.max(0, Math.min(100, 100 * (indent / 32)));
+        track?.addCue(cue);
       }
     }
-    if (track && result.length) {
-      // Sort bottom cues in reverse order so that they render in line order when overlapping in Chrome
-      result.sort((cueA, cueB) => {
-        if (cueA.line === 'auto' || cueB.line === 'auto') {
-          return 0;
-        }
-        // TODO: These lines cause captions to render out of order in some 608/708 cases.
-        // if (cueA.line > 8 && cueB.line > 8) {
-        //   return cueB.line - cueA.line;
-        // }
-        return cueA.line - cueB.line;
-      });
-      result.forEach((cue) => addCueToTrack(track, cue));
-    }
+
     return result;
   },
 };
