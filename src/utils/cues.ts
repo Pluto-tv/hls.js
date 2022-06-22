@@ -28,7 +28,7 @@ const Cues: CuesInterface = {
     let indenting: boolean;
     let indent: number;
     let text: string;
-    // const Cue = (self.VTTCue || self.TextTrackCue) as any;
+    const Cue = (self.VTTCue || self.TextTrackCue) as any;
 
     for (let r = 0; r < captionScreen.rows.length; r++) {
       row = captionScreen.rows[r];
@@ -53,7 +53,7 @@ const Cues: CuesInterface = {
           endTime += 0.0001;
         }
 
-        cue = new VTTCue(startTime, endTime, fixLineBreaks(text.trim()));
+        cue = new Cue(startTime, endTime, fixLineBreaks(text.trim()));
 
         if (indent >= 16) {
           indent--;
