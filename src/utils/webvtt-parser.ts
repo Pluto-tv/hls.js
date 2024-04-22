@@ -156,7 +156,7 @@ export function parseWebVTT(
       cue.id = generateCueId(cue.startTime, cue.endTime, text);
     }
 
-    if (cue.endTime > 0) {
+    if (cue.startTime >= 0 && cue.endTime > 0) {
       cues.push(cue);
     }
   };

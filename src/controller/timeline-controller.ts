@@ -715,7 +715,7 @@ function newVTTCCs(): VTTCCs {
     0: {
       start: 0,
       prevCC: -1,
-      new: false,
+      new: true,
     },
   };
 }
