@@ -223,7 +223,7 @@ export class SubtitleStreamController
       this.fragmentTracker.removeFragmentsInRange(
         0,
         this.media.duration,
-        PlaylistLevelType.SUBTITLE
+        PlaylistLevelType.SUBTITLE,
       );
 
       // Clear internal buffered lists
