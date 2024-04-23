@@ -200,20 +200,37 @@ export class SubtitleStreamController
   }
 
   onMediaSeeking() {
+    if (!this.media) {
+      return;
+    }
     // Find the currently showing subtitle track
-    const tracks = Array.from<TextTrack>(this.media.textTracks);
-    const track = tracks.find(track => track.mode != 'disabled' && (track.kind == 'subtitles' || track.kind == 'captions'));
+    const tracks = this.media.textTracks;
+    let track;
+    for (let i = 0; i < tracks.length; i++) {
+      const textTrack = tracks[i];
+      if (
+        textTrack.mode != 'disabled' &&
+        (textTrack.kind == 'subtitles' || textTrack.kind == 'captions')
+      ) {
+        track = textTrack;
+        break;
+      }
+    }
 
     // Manually reset the cues and fragments
-    if (track && track.cues) {
+    if (track?.cues) {
       // Clear all text track cues
-      Array.from(track.cues).forEach(cue => track.removeCue(cue));
+      Array.from(track.cues).forEach((cue) => track.removeCue(cue));
 
       // Clear all loaded subtitle fragments
-      this.fragmentTracker.removeFragmentsInRange(0, this.media.duration, PlaylistLevelType.SUBTITLE);
+      this.fragmentTracker.removeFragmentsInRange(
+        0,
+        this.media.duration,
+        PlaylistLevelType.SUBTITLE
+      );
 
       // Clear internal buffered lists
-      this.tracksBuffered.forEach((_, index, tracks) => tracks[index] = []);
+      this.tracksBuffered.forEach((_, index, tracks) => (tracks[index] = []));
     }
 
     this.fragPrevious = null;
