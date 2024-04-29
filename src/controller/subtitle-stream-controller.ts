@@ -200,11 +200,8 @@ export class SubtitleStreamController
   }
 
   onMediaSeeking() {
-    if (!this.media) {
-      return;
-    }
     // Find the currently showing subtitle track
-    const tracks = this.media.textTracks;
+    const tracks = this.media?.textTracks || [];
     let track;
     for (let i = 0; i < tracks.length; i++) {
       const textTrack = tracks[i];
@@ -218,7 +215,7 @@ export class SubtitleStreamController
     }
 
     // Manually reset the cues and fragments
-    if (track?.cues) {
+    if (track?.cues && this.media) {
       // Clear all text track cues
       Array.from(track.cues).forEach((cue) => track.removeCue(cue));
 
