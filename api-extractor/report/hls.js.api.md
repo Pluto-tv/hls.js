@@ -3198,6 +3198,8 @@ export class SubtitleStreamController extends BaseStreamController implements Ne
     onManifestLoading(): void;
     // (undocumented)
     onMediaDetaching(): void;
+    // (undocumented)
+    onMediaSeeking(): void;
     // Warning: (ae-forgotten-export) The symbol "SubtitleFragProcessed" needs to be exported by the entry point hls.d.ts
     //
     // (undocumented)

@@ -199,6 +199,40 @@ export class SubtitleStreamController
     }
   }
 
+  onMediaSeeking() {
+    // Find the currently showing subtitle track
+    const tracks = this.media?.textTracks || [];
+    let track;
+    for (let i = 0; i < tracks.length; i++) {
+      const textTrack = tracks[i];
+      if (
+        textTrack.mode != 'disabled' &&
+        (textTrack.kind == 'subtitles' || textTrack.kind == 'captions')
+      ) {
+        track = textTrack;
+        break;
+      }
+    }
+
+    // Manually reset the cues and fragments
+    if (track?.cues && this.media) {
+      // Clear all text track cues
+      Array.from(track.cues).forEach((cue) => track.removeCue(cue));
+
+      // Clear all loaded subtitle fragments
+      this.fragmentTracker.removeFragmentsInRange(
+        0,
+        this.media.duration,
+        PlaylistLevelType.SUBTITLE,
+      );
+
+      // Clear internal buffered lists
+      this.tracksBuffered.forEach((_, index, tracks) => (tracks[index] = []));
+    }
+
+    this.fragPrevious = null;
+  }
+
   // If something goes wrong, proceed to next frag, if we were processing one.
   onError(event: Events.ERROR, data: ErrorData) {
     const frag = data.frag;
