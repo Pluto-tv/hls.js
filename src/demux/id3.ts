@@ -399,7 +399,7 @@ let decoder: TextDecoder;
 function getTextDecoder() {
   // On Play Station 4, TextDecoder is defined but partially implemented.
   // Manual decoding option is preferable
-  if (navigator.userAgent.includes('PlayStation 4')) {
+  if (navigator.userAgent.indexOf('PlayStation 4') > -1) {
     return;
   }
 
